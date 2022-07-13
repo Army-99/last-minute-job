@@ -58,48 +58,68 @@ const usePerson = () => {
     return null;
 }
 
-const CheckIfHireQuestion = async(nrJobApplied) => {
-  setIsLoading(true);
-    let options = {
-      contractAddress: ContractAddress,
-      functionName: "ShowIfHireQuestion",
-      abi: contractABI,
-      params: {
-        _jobApplied: nrJobApplied
+  const CheckIfHireQuestion = async(nrJobApplied) => {
+    setIsLoading(true);
+      let options = {
+        contractAddress: ContractAddress,
+        functionName: "ShowIfHireQuestion",
+        abi: contractABI,
+        params: {
+          _jobApplied: nrJobApplied
+        }
+      };
+      try{
+        return await Moralis.executeFunction(options);
+      }catch(err){
+        console.error(err)
+        setError(err);
       }
-    };
-    try{
-      return await Moralis.executeFunction(options);
-    }catch(err){
-      console.error(err)
-      setError(err);
-    }
-  setIsLoading(false);
-  return null;
-}
+    setIsLoading(false);
+    return null;
+  }
 
-const CheckIfHired = async(nrJobApplied) => {
-  setIsLoading(true);
-    let options = {
-      contractAddress: ContractAddress,
-      functionName: "ShowIfHired",
-      abi: contractABI,
-      params: {
-        _jobApplied: nrJobApplied
+  const CheckIfHired = async(nrJobApplied) => {
+    setIsLoading(true);
+      let options = {
+        contractAddress: ContractAddress,
+        functionName: "ShowIfHired",
+        abi: contractABI,
+        params: {
+          _jobApplied: nrJobApplied
+        }
+      };
+      try{
+        return await Moralis.executeFunction(options);
+      }catch(err){
+        console.error(err)
+        setError(err);
       }
-    };
-    try{
-      return await Moralis.executeFunction(options);
-    }catch(err){
-      console.error(err)
-      setError(err);
-    }
-  setIsLoading(false);
-  return null;
-}
+    setIsLoading(false);
+    return null;
+  }
+
+  const FetchWorker = async(nrWorker) => {
+      let options = {
+        contractAddress: ContractAddress,
+        functionName: "ShowPerson",
+        abi: contractABI,
+        params: {
+          _nrWorker: nrWorker
+        }
+      };
+      try{
+        return await Moralis.executeFunction(options);
+      }catch(err){
+        console.error(err)
+        setError(err);
+      }
+    setIsLoading(false);
+    return null;
+
+  }
 
 
-  return {isPerson,error,isLoading, FetchPersonPublicJob, CheckIfHireQuestion, CheckIfHired};
+  return {isPerson,error,isLoading, FetchPersonPublicJob, CheckIfHireQuestion, CheckIfHired, FetchWorker};
 
 }
 export default usePerson;

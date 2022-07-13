@@ -39,7 +39,6 @@ const Candidate = ({item,proposeHire, isLoading, SetAbsentHours, refHoursAbsent}
                         <Button>{CV}</Button>
                         <p>Phone: {mobilePhone}</p>
                     </div>
-                    
                 </div>
             </div>
         </div>

@@ -362,6 +362,10 @@ contract LastMinuteJob is ReentrancyGuard {
     }
 
     /* NEW RETURN ABSENT OF CANDIDATES HOUR */
+    function ShowAbsentHoursCandidate(uint _nrJob, uint _nrCandidate) jobExist(_nrJob) public view returns(uint){
+        Job storage job = jobs[_nrJob];
+        return( job.candidates[_nrCandidate].absentHour);
+    }
 
     function ShowCompanyJobsCounter() onlyCompany public view returns(uint){
         Company storage company = companies[msg.sender];
@@ -535,6 +539,13 @@ contract LastMinuteJob is ReentrancyGuard {
         }
 
         emit ev_CloseRequest(_nRequest, request.status);
+    }
+
+    /* NEW SHOW PERSON FOR FETCH THE WORKER*/
+    function ShowPerson(uint _nrWorker) public view returns(string memory, string memory, uint, string memory, string memory, string memory, address) {
+        Person storage person = persons[personsAddress[_nrWorker]];
+        address wallet = personsAddress[_nrWorker];
+        return(person.name, person.surname, person.age, person.mobilePhone, person.CV, person.coverLetter, wallet);
     }
 
     function ShowCounterRequestsCompany() public view returns(uint) {

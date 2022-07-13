@@ -55,7 +55,6 @@ const useCompany = () => {
   }
 
   const HireQuestion = async(nrCompanyJob, nrCandidate) => {
-    //RequestHire(uint _nrCompanyJob, uint _nrCandidate)
     setisLoadingCompany(true);
     let options = {
       contractAddress: ContractAddress,
@@ -76,8 +75,9 @@ const useCompany = () => {
     }
   setisLoadingCompany(false);
   return null;
-
   }
+
+  
 
   return {isCompany,error,isLoadingCompany, FetchCompanyPublicJob, HireQuestion};
 
