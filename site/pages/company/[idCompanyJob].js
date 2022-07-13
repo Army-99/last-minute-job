@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { MoralisProvider, useMoralis } from "react-moralis";
 import useCompany from "../../hooks/useCompany";
 import { ContractAddress, contractABI} from "../../Contract/datas";
@@ -11,7 +11,7 @@ import Button from "../../components/UI/Button";
 const ManageJob = () => {
     const { isAuthenticated, Moralis } = useMoralis();
     const { isCompany, FetchCompanyPublicJob, HireQuestion, isLoadingCompany } = useCompany();
-    const { FetchJob, ShowJobCandidatesCounter, ShowJobCandidate, CheckJobClose } = useJob();
+    const { FetchJob, ShowJobCandidatesCounter, ShowJobCandidate, CheckJobClose, SetAbsentHours } = useJob();
 
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState();
@@ -25,6 +25,7 @@ const ManageJob = () => {
     const [counterCandidates, setCounterCandidates] = useState();
     const [candidates, setCandidates] = useState([]);
     const [jobClose, setJobClose] = useState(null);
+    const refHoursAbsent = useRef();
     
 
     //Check if is auth, is company and is the owner
@@ -146,6 +147,34 @@ const ManageJob = () => {
         setIsLoading(false);
     }
 
+
+    const HandleSetAbsentHour = async(e, nrCandidate) => {
+        e.preventDefault();
+        /*CHECK IF THE MAX HOURS IS > HOURS TO ADD(ALREADY CHECKED IN SMART CONTRACT)*/
+
+        if(!refHoursAbsent.current.input.value || refHoursAbsent.current.input.value < 1){
+            error=true;
+            refHoursAbsent.current.label.className = "text-red-500 text-xs italic";
+        }else refHoursAbsent.current.label.className = "hidden";
+
+        let options = {
+            contractAddress: ContractAddress,
+            functionName: "SetAbsentHours",
+            abi: contractABI,
+            params: {
+                _nrJob: jobID,
+                _nrCandidate: nrCandidate,
+                _absentHours: refHoursAbsent.current.input.value,
+            }
+            };
+            try{
+                return await Moralis.executeFunction(options);
+            }catch(err){
+                console.error(err)
+            }
+        
+    }
+
     
 
     return(
@@ -153,9 +182,9 @@ const ManageJob = () => {
         {isAuthenticated && isCompany && owner &&
         <div className="grid lg:grid-cols-3 sm:grid-cols-2 w-full h-screen overflow-y-auto scrollbar-hide">
             {
-                candidates.map((item,i) => {
+                candidates.map((item,i) => { 
                     return(
-                       <Candidate item={item} isLoadingCompany={isLoadingCompany} proposeHire={e => HandleHireQuestion(e,i)}></Candidate>
+                       <Candidate item={item} isLoadingCompany={isLoadingCompany} proposeHire={e => HandleHireQuestion(e,i)} SetAbsentHours={ e => HandleSetAbsentHour(e,i)} refHoursAbsent={refHoursAbsent}></Candidate>
                     )})
             }
             <div className="flex justify-center h-10">

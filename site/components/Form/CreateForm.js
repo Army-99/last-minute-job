@@ -8,26 +8,6 @@ import { useRef } from "react";
 import InputSplit from "../UI/InputSplit";
 import { useRouter } from 'next/router';
 
-const INPUTS = [
-
-    {
-        value: "Description",
-        widht: "sm:w-2/3",
-        type: "text"
-    },
-    {
-        value: "Working Address",
-        widht: "sm:w-2/3",
-        type: "text"
-    },
-    {
-        value: "Role Position",
-        widht: "sm:w-2/3",
-        type: "text"
-    },
-]
-
-
 const CreateForm = () => {
     const { Moralis } = useMoralis();
     const router = useRouter();

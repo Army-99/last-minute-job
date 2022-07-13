@@ -1,7 +1,8 @@
 import HexToDec from "../../helpers/formatters";
 import Button from "../UI/Button";
+import Input from "../UI/Input";
 
-const Candidate = ({item,proposeHire, isLoading}) => {
+const Candidate = ({item,proposeHire, isLoading, SetAbsentHours, refHoursAbsent}) => {
     const name = item.value[0];
     const surname = item.value[1];
     const mobilePhone = item.value[2];
@@ -30,8 +31,15 @@ const Candidate = ({item,proposeHire, isLoading}) => {
                 </div>
 
                 <div className="bg-gray-200 px-6 py-4">
-                    <button>CV: {CV}</button>
-                    <p>Phone: {mobilePhone}</p>
+                    <div className="flex">
+                        <Input value="Absent hours" type="number" min={0} width={"sm:w-2/3"} ref={refHoursAbsent}></Input>
+                        <Button onClick={SetAbsentHours}>Set</Button>
+                    </div>
+                    <div className="flex">
+                        <Button>{CV}</Button>
+                        <p>Phone: {mobilePhone}</p>
+                    </div>
+                    
                 </div>
             </div>
         </div>

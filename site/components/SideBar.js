@@ -26,16 +26,11 @@ const SideBar = ({children}) => {
     const { isAuthenticated, logout } = useMoralis();
     const { isCompany } = useCompany();
     const { isPerson } = usePerson();
-    const { counterAppliedJobs, error } = useCounters();
 
     const HandlerLogOut = async() => {
         await logout();
     }
 
-    useEffect(() => {
-        //console.log(counterAppliedJobs);
-        //console.log(error);
-    },[counterAppliedJobs])
 
     
 
@@ -74,7 +69,7 @@ const SideBar = ({children}) => {
                         :
                         isPerson &&
                         <>
-                            <LinkStruct name={"Last Applications"} href={"/worker/jobApplications"}>{counterAppliedJobs}</LinkStruct>
+                            <LinkStruct name={"Last Applications"} href={"/worker/jobApplications"}></LinkStruct>
                             <LinkStruct name={"Jobs"} href={"/worker/allJobs"}></LinkStruct>
                             <LinkStruct name={"Requests"} href={"/worker/incomingRequests"}></LinkStruct>
                         </>

@@ -131,6 +131,8 @@ const useJob = () => {
             }
     }
 
+    //SetAbsentHours(uint _nrJob, uint _nrCandidate, uint _absentHours) 
+
     return {FetchJob, ShowJobCandidatesCounter, ShowJobCandidate, AcceptJob, isLoading, CheckPersonHired, CheckPersonApplied, CheckJobClose};
 }
 

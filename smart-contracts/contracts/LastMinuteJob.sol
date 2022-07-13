@@ -361,6 +361,8 @@ contract LastMinuteJob is ReentrancyGuard {
         return(candidate.name, candidate.surname, candidate.mobilePhone, candidate.age, candidate.CV, candidate.coverLetter, candidate.proposalHire, candidate.hired);
     }
 
+    /* NEW RETURN ABSENT OF CANDIDATES HOUR */
+
     function ShowCompanyJobsCounter() onlyCompany public view returns(uint){
         Company storage company = companies[msg.sender];
         return (company.counterJobs);
