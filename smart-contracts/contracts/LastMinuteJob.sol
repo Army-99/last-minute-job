@@ -552,8 +552,20 @@ contract LastMinuteJob is ReentrancyGuard {
         return(companies[msg.sender].counterSendedRequests);
     }
 
+    /*NEW*/
+    function ShowIDRequestCompany(uint _nrCompanyRequest) public view returns(uint) {
+        require(_nrCompanyRequest<companies[msg.sender].counterSendedRequests,"The sended request  doesn't exist");
+        return(companies[msg.sender].sendedRequests[_nrCompanyRequest]);
+    }
+
     function ShowCounterRequestsPerson() public view returns(uint) {
         return(persons[msg.sender].counterIncomingRequests);
+    }
+
+    /*NEW*/
+    function ShowIDRequestPerson(uint _nrPersonRequest) public view returns(uint) {
+        require(_nrPersonRequest<persons[msg.sender].counterIncomingRequests,"The incoming request doesn't exist");
+        return(persons[msg.sender].incomingRequests[_nrPersonRequest]);
     }
 
     function ShowCounterRequests() public view returns(uint) {
