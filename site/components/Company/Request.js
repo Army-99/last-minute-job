@@ -4,9 +4,6 @@ import { ContractAddress, contractABI } from "../../Contract/datas";
 import HexToDec from "../../helpers/formatters";
 import useRequest from "../../hooks/useRequest";
 
-
-
-
 const Request = () => {
     const { FetchCounterRequestCompany, ShowIDRequestCompany, FetchRequest } = useRequest();
     const { Moralis } = useMoralis();
@@ -46,14 +43,20 @@ const Request = () => {
             {requests.map((item,k) => {
                 let owner= item.value[0];
                 let destination=item.value[1];
-                let dateFrom = HexToDec(item.value[2]);
-                let dateTo = HexToDec(item.value[3]);
+                let dateFrom = new Date(HexToDec(item.value[2])*1000);
+
+                let dateTo = new Date(HexToDec(item.value[3])*1000);
                 let value = Moralis.Units.FromWei(item.value[4]);
-                let hourStart = HexToDec(item.value[5])/60;
-                //let minuteStart = hourStart % 60;
-                let hourFinish = HexToDec(item.value[6]);
-                let status;
-                switch(item.value[7]) {
+
+                let hStart = HexToDec(item.value[5]);
+                let hourStart = ("0" + (Number(hStart)/60).toFixed()).slice(-2);
+                let minuteStart = ("0" +  Number(hStart) % 60).slice(-2);
+                let hFinish = HexToDec(item.value[6]);
+                let hourFinish = ("0" + (Number(hFinish)/60).toFixed()).slice(-2);
+                let minuteFinish = ("0" +  Number(hFinish) % 60).slice(-2);
+
+                let status=item.value[7];
+                switch(status) {
                     case 0: {
                         status = "Pending";
                     break;
@@ -75,13 +78,12 @@ const Request = () => {
                         <div className="bg-gray-200 text-gray-700 text-lg px-6 py-4">
                             <p className="font-bold">Destination HASH</p>
                             <div className="flex justify-between">
-                                <p>DateFrom: {dateFrom}</p>
-                                <p>DateTo: {dateTo}</p>
+                                <p>{dateFrom.getDate() + '/' + dateFrom.getMonth() + '/' +dateFrom.getFullYear()} -  
+                                 {dateTo.getDate() + '/' + dateTo.getMonth() + '/' +dateTo.getFullYear()}</p>
                             </div>
                             
                             <div className="flex justify-between">
-                                <p>Hour Start: {hourStart}:</p>
-                                <p>Hour Finish: {hourFinish}</p>
+                                <p>{hourStart}:{minuteStart} - {hourFinish}:{minuteFinish}</p>
                             </div>
                         </div>
 
