@@ -58,8 +58,8 @@ const ModalCreateRequest = ({addressWorker, close}) => {
 
         if(!error)
         {
-            const hourInit = Number((HourIRef.current.input.value).split(":")[0]) *60 + Number((HourIRef.current.input.value).split(":")[1]);
-            const hourFinish = Number((HourFRef.current.input.value).split(":")[0]) *60 + Number((HourFRef.current.input.value).split(":")[1]);
+            const hourInit = Number((HourIRef.current.input.value).split(":")[0]) * 60 + Number((HourIRef.current.input.value).split(":")[1]);
+            const hourFinish = Number((HourFRef.current.input.value).split(":")[0]) * 60 + Number((HourFRef.current.input.value).split(":")[1]);
 
             if(hourFinish <= hourInit)
                 hourFinish += 24 * 60;
