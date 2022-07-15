@@ -45,9 +45,42 @@ const useRequest = () => {
         return null;
     }
 
-    //ShowCounterRequestsPerson()
+    const ShowCounterRequestsPerson = async() => {
+        setIsLoadingRequest(true);
+        let options = {
+        contractAddress: ContractAddress,
+        functionName: "ShowCounterRequestsPerson",
+        abi: contractABI,
+        };
+        try{
+            return await Moralis.executeFunction(options);
+        }catch(err){
+        console.error(err)
+        setErrorRequest(err);
+        }
+        setIsLoadingRequest(false);
+        return null;
+    }
 
-    //ShowIDRequestPerson(uint _nrPersonRequest)
+    const ShowIDRequestPerson = async(nrPersonRequest) => {
+        setIsLoadingRequest(true);
+        let options = {
+        contractAddress: ContractAddress,
+        functionName: "ShowIDRequestPerson",
+        abi: contractABI,
+        params: {
+            _nrPersonRequest: nrPersonRequest
+        }
+        };
+        try{
+        return await Moralis.executeFunction(options);
+        }catch(err){
+        console.error(err)
+        setErrorRequest(err);
+        }
+        setIsLoadingRequest(false);
+        return null;
+    }
 
     const FetchRequest = async(nrRequest) => {
         setIsLoadingRequest(true);
@@ -69,8 +102,72 @@ const useRequest = () => {
         return null;
     }
 
+    const ShowMessages = async(nrRequest) => {
+        setIsLoadingRequest(true);
+        let options = {
+        contractAddress: ContractAddress,
+        functionName: "ShowMessages",
+        abi: contractABI,
+        params: {
+            _nRequest: nrRequest
+        }
+        };
+        try{
+            const transaction = await Moralis.executeFunction(options);
+            setIsLoadingRequest(false);
+            return transaction;
+        }catch(err){
+        console.error(err)
+        setErrorRequest(err);
+        }
+        setIsLoadingRequest(false);
+        return null;
+    }
 
-  return { FetchCounterRequestCompany, ShowIDRequestCompany, FetchRequest };
+    const SendMessage = async(nrRequest, message) => {
+        setIsLoadingRequest(true);
+        let options = {
+        contractAddress: ContractAddress,
+        functionName: "SendMessage",
+        abi: contractABI,
+        params: {
+            _nRequest: nrRequest,
+            _message: message
+        }
+        };
+        try{
+        const tx = await Moralis.executeFunction(options);
+        await tx.wait();
+        }catch(err){
+        console.error(err)
+        setErrorRequest(err);
+        }
+        setIsLoadingRequest(false);
+        return null;
+    }
+
+    const CloseRequest = async(nrRequest, message) => {
+        setIsLoadingRequest(true);
+        let options = {
+        contractAddress: ContractAddress,
+        functionName: "CloseRequest",
+        abi: contractABI,
+        params: {
+            _nRequest: nrRequest
+        }
+        };
+        try{
+        const tx = await Moralis.executeFunction(options);
+        await tx.wait();
+        }catch(err){
+        console.error(err)
+        setErrorRequest(err);
+        }
+        setIsLoadingRequest(false);
+        return null;
+    }
+
+  return { FetchCounterRequestCompany, ShowIDRequestCompany, FetchRequest, ShowCounterRequestsPerson, ShowIDRequestPerson, ShowMessages, SendMessage, isLoadingRequest, CloseRequest };
 
 }
 export default useRequest;

@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect } from "react"
 import { useMoralis } from "react-moralis";
+import IncomingRequest from "../../components/Worker/IncomingRequests";
 import usePerson from "../../hooks/usePerson";
 
 const IncomingRequests = () => {
@@ -10,13 +11,13 @@ const IncomingRequests = () => {
 
     useEffect(() => {
         if(!isAuthenticated)
-            if (!isAuthenticated) router.replace("/");
+            router.replace("/");
         if(isPerson!=null  && !isPerson)
-            if (!isPerson) router.replace("/dashboard");
+            router.replace("/dashboard");
     },[isPerson, isAuthenticated])
 
     return(
-        <div className="text-white">Incoming Requests</div>
+        <IncomingRequest></IncomingRequest>
     );
 }
 

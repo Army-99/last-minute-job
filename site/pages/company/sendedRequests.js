@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect } from "react"
 import { useMoralis } from "react-moralis";
-import Request from "../../components/Company/Request";
+import SendedRequest from "../../components/Company/SendedRequest";
 import useCompany from "../../hooks/useCompany";
 
 const SendedRequests = () => {
@@ -19,7 +19,7 @@ const SendedRequests = () => {
     return(
         <>
         {isAuthenticated && isCompany &&
-            <Request></Request>
+            <SendedRequest></SendedRequest>
         }
         </>
     )

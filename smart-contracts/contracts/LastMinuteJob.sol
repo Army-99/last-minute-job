@@ -67,7 +67,7 @@ contract LastMinuteJob is ReentrancyGuard {
     }
 
     struct Request{
-        address owner;
+        address payable owner;
         address destination;
         uint dateFrom;
         uint dateTo;
@@ -425,7 +425,7 @@ contract LastMinuteJob is ReentrancyGuard {
         require(_hourStart>0 && _hourFinish>_hourStart && _dateFrom>0 && _dateTo>_dateFrom,"The inputs are incorrects");
         
         Request storage newRequest = requests[counterRequests];
-            newRequest.owner=msg.sender;
+            newRequest.owner=payable(msg.sender);
             newRequest.destination=_destination;
             newRequest.dateFrom=_dateFrom;
             newRequest.dateTo=_dateTo;
@@ -536,6 +536,7 @@ contract LastMinuteJob is ReentrancyGuard {
             request.isActive=false;
         }else{
             request.isActive=false;
+            request.owner.transfer(request.value);
         }
 
         emit ev_CloseRequest(_nRequest, request.status);
