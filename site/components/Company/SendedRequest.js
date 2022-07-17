@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
-import HexToDec from "../../helpers/formatters";
+import { HexToDec } from "../../helpers/formatters";
 import useRequest from "../../hooks/useRequest";
 import ShowRequests from "../ShowRequests";
+import Loader from "../UI/Loader";
 
 const SendedRequest = () => {
     const { FetchCounterRequestCompany, ShowIDRequestCompany, FetchRequest, ShowMessages } = useRequest();
@@ -21,7 +22,8 @@ const SendedRequest = () => {
     //Fetch the Request counter of company
     useEffect(() => {
         const Fetch = async() => {
-            setCounterRequest(HexToDec(await FetchCounterRequestCompany()));
+            let counter = (await FetchCounterRequestCompany());
+            setCounterRequest(HexToDec(counter));
         }
         Fetch();
     },[])
@@ -29,10 +31,10 @@ const SendedRequest = () => {
     //Fetch the requests when the counter is valorize
     useEffect(() => {
         const FetchRequests = async() => {
-                for(let k=0; k<counterRequest; k++){
-                    let nrRequest = await ShowIDRequestCompany(k);
-                    addRequest(await FetchRequest(nrRequest),HexToDec(nrRequest));
-                }
+            for(let k=0; k<counterRequest; k++){
+                let nrRequest = await ShowIDRequestCompany(k);
+                addRequest(await FetchRequest(nrRequest),HexToDec(nrRequest));
+            }
         }
         FetchRequests();
     },[counterRequest])
@@ -47,7 +49,8 @@ const SendedRequest = () => {
     return(
         <>
         {
-            show && <ShowRequests requests={requests} ></ShowRequests>
+            show ? <ShowRequests requests={requests} ></ShowRequests>
+            : <Loader></Loader>
         }
         </>
     )

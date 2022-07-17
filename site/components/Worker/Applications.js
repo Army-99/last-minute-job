@@ -14,7 +14,6 @@ const Applications = () => {
     const { FetchJob, AcceptJob, isLoading, CheckJobClose } = useJob();
 
     const addItem = (data, hireQuestion, hired, close) => {
-      //console.log(hireQuestion)
       setJobs(prevItems => [...prevItems, {
         id: prevItems.length,
         value: data,
@@ -31,7 +30,6 @@ const Applications = () => {
       for (let i=0; i < counterAppliedJobs; i++){
         const personAppliedJob = await FetchPersonPublicJob(i);
         addItem(await FetchJob(personAppliedJob), await CheckIfHireQuestion(i), await CheckIfHired(i), await CheckJobClose(i));
-        //console.log(await CheckIfHireQuestion(i));
       }
     }
     Fetch();
@@ -39,9 +37,8 @@ const Applications = () => {
 
   useEffect(() => {
     if(jobs.length==counterAppliedJobs){
-      console.log(jobs)
       setShow(true);
-  }  
+    }  
   },[jobs])
 
   const HandleAcceptJob = async(e, nrAppliedJob) => {

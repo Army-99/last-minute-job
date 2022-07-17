@@ -1,14 +1,13 @@
-
 import { useMoralis } from "react-moralis";
 import Link from 'next/link';
+import useCompany from "../hooks/useCompany";
+import usePerson from "../hooks/usePerson";
+import { getEllipsisTxt } from "../helpers/formatters";
+import { useMoralisWeb3Api, useNativeBalance  } from "react-moralis";
 
 import {
     HomeIcon
-}from "@heroicons/react/outline";
-import useCompany from "../hooks/useCompany";
-import usePerson from "../hooks/usePerson";
-import useCounters from "../hooks/useCounters";
-import { useEffect } from "react";
+} from "@heroicons/react/outline";
 
 const LinkStruct = ({name, href, children}) => { 
     return(
@@ -23,16 +22,17 @@ const LinkStruct = ({name, href, children}) => {
 }
 
 const SideBar = ({children}) => {
-    const { isAuthenticated, logout } = useMoralis();
-    const { isCompany } = useCompany();
+    const { isAuthenticated, logout, account, chainId } = useMoralis();
+    const { data: balance } = useNativeBalance({ chain : chainId, address: account });
+
     const { isPerson } = usePerson();
+    const { isCompany } = useCompany();
+    const Web3Api = useMoralisWeb3Api();
+
 
     const HandlerLogOut = async() => {
         await logout();
     }
-
-
-    
 
     return(
     <div className='bg-black h-screen overflow-hidden'>
@@ -49,11 +49,11 @@ const SideBar = ({children}) => {
                     </div>
 
                     <div>
-                        <p className="text-center">HASH</p>
+                        <p className="text-center">{getEllipsisTxt(account)}</p>
                     </div>
                     
                     <div>
-                        <p className="text-center">BALANCE</p>
+                        <p className="text-center">{balance.formatted}</p>
                     </div>
                 </div>
                 <div className="flex">

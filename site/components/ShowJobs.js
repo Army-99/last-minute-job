@@ -5,7 +5,7 @@ import Button from "./UI/Button";
 import { ContractAddress, contractABI} from "../Contract/datas";
 import useCounter from "../hooks/useCounters"
 import Link from 'next/link';
-import HexToDec from "../helpers/formatters";
+import { getEllipsisTxt, HexToDec } from "../helpers/formatters";
 import { useRouter } from "next/router";
 
 
@@ -52,7 +52,6 @@ const ShowJobs = ({jobs, applied, acceptJob, Loading}) => {
         <div className="sm:grid md:grid-cols-2 lg:grid-cols-3 sm:w-full">
             {
                 jobs.map( (item,k) => {
-                    //console.log(item)
                     let title = item.value[2];
                     let owner = item.value[0];
                     let total = Moralis.Units.FromWei(item.value[1]);
@@ -64,8 +63,6 @@ const ShowJobs = ({jobs, applied, acceptJob, Loading}) => {
                     let dateFinish = new Date(HexToDec(item.value[8]) * 1000);
                     let searching = item.value[9];
                     let counterCandidates = HexToDec(item.value[10]);
-
-                    console.log(workingAddress)
 
                     return(
                             <div className="flex flex-col bg-white shadow-lg rounded-lg overflow-hidden text-black m-5" key={k}>
@@ -97,7 +94,7 @@ const ShowJobs = ({jobs, applied, acceptJob, Loading}) => {
                                         <div className="uppercase text-xs text-gray-600 font-bold">Company</div>
                                         <div className="flex items-center pt-3">
                                             <div className="ml-4">
-                                                <p className="font-bold">HASH{/*owner*/}</p>
+                                                <p className="font-bold">{getEllipsisTxt(owner)}</p>
                                             </div>
                                         </div>
                                     </>

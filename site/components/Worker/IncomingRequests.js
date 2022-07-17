@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
-import HexToDec from "../../helpers/formatters";
+import {HexToDec} from "../../helpers/formatters";
 import useRequest from "../../hooks/useRequest";
 import ShowRequests from "../ShowRequests";
+import Loader from "../UI/Loader";
 
 const IncomingRequest = () => {
     const { ShowCounterRequestsPerson, ShowIDRequestPerson, FetchRequest, isLoadingRequest } = useRequest();
@@ -48,7 +49,7 @@ const IncomingRequest = () => {
 
     return(
         <>
-        {show && <ShowRequests requests={requests}></ShowRequests>}
+        {show ? <ShowRequests requests={requests}></ShowRequests> : <Loader></Loader>}
         </>
     )
 }

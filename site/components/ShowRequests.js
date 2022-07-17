@@ -1,5 +1,5 @@
 import { useMoralis } from "react-moralis";
-import HexToDec from "../helpers/formatters";
+import { getEllipsisTxt, HexToDec } from "../helpers/formatters";
 import usePerson from '../hooks/usePerson';
 import useCompany from '../hooks/useCompany';
 import Button from './UI/Button';
@@ -89,7 +89,8 @@ const ShowRequests = ({requests}) => {
                         <div className="flex flex-col bg-white shadow-lg rounded-lg overflow-hidden text-black m-5">
                             <div className="bg-gray-200 text-gray-700 text-lg px-6 py-4">
                                 {isActive && <p>Request is Open</p>}
-                                <p className="font-bold">Destination {/*destination*/}</p>
+                                {isCompany && <p className="font-bold">Worker: {getEllipsisTxt(destination)} {/*destination*/}</p>}
+                                {isPerson && <p className="font-bold">Compnay: {getEllipsisTxt(owner)} {/*destination*/}</p>}
                                 <div className="flex justify-between">
                                     <p>{dateFrom.getDate() + '/' + dateFrom.getMonth() + '/' +dateFrom.getFullYear()} - {dateTo.getDate() + '/' + dateTo.getMonth() + '/' +dateTo.getFullYear()}</p>
                                 </div>
@@ -109,7 +110,7 @@ const ShowRequests = ({requests}) => {
                             <div className="bg-gray-200 px-6 py-4">
                                 <div className="flex justify-between">
                                     <p>{value} ETH</p>
-                                    <Button Loading={isLoadingRequest} onClick={ (e) => HandleShowMessages(e, nrRequest, isActive) }>Show messages</Button>
+                                    <Button onClick={ (e) => HandleShowMessages(e, nrRequest, isActive) }>Show messages</Button>
                                 </div>
                             </div>
                         </div>

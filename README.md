@@ -11,10 +11,11 @@ The worker can search for a job, and companies will be able to send private requ
 
 # TODOS:
 FRONTEND:
-  Add the possibility to add hour absent to worker
-  Show all workers in the page /company/allWorkers
-  Implement the requests
-  Add the hourly pay in the summary
+  Set CV link to be viewed
+
+  (All)
+  Show worker already hired in jobs and hourly pay
+  Create a nice loader
   Improve UX and UI
   
  SMARTCONTRACT:

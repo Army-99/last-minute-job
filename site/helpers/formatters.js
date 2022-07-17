@@ -1,6 +1,10 @@
-const HexToDec = (data) => {
+export const HexToDec = (data) => {
     return parseInt(data._hex, 16)
 }
 
-
-export default HexToDec;
+export const getEllipsisTxt = (str, n = 6) => {
+    if (str) {
+      return `${str.slice(0, n)}...${str.slice(str.length - n)}`;
+    }
+    return "";
+  };

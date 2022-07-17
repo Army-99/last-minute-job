@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import HexToDec from "../helpers/formatters";
 
 const useRequest = () => {
-  const  { Moralis, isAuthenticated, isWeb3Enabled, isWeb3EnableLoading, enableWeb3, web3 } = useMoralis();
+  const  { Moralis} = useMoralis();
   const [ errorRequest, setErrorRequest ] = useState(null);
   const [ isLoadingRequest, setIsLoadingRequest ] = useState(false);
 

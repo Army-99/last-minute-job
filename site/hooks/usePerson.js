@@ -1,7 +1,7 @@
 import { contractABI, ContractAddress } from "../Contract/datas";
 import { useMoralis } from "react-moralis";
 import { useEffect, useState } from "react";
-import HexToDec from "../helpers/formatters";
+import {HexToDec} from "../helpers/formatters";
 
 const usePerson = () => {
   const  { Moralis, isAuthenticated, isWeb3Enabled, isWeb3EnableLoading, enableWeb3, web3 } = useMoralis();

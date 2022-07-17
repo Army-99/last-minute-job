@@ -3,7 +3,7 @@ import { useMoralis } from "react-moralis";
 import { useEffect, useState } from "react";
 
 const useCompany = () => {
-  const  { Moralis, isAuthenticated, isWeb3Enabled, isWeb3EnableLoading, enableWeb3, web3, } = useMoralis();
+  const  { Moralis, isAuthenticated, isWeb3Enabled, isWeb3EnableLoading, enableWeb3, web3 } = useMoralis();
   const [isCompany, setIsCompany] = useState(null);
   const [error, setError] = useState(null);
   const [isLoadingCompany, setisLoadingCompany] = useState(false);

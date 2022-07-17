@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { ContractAddress, contractABI} from '../../Contract/datas';
 import { useMoralis } from "react-moralis";
-import HexToDec from '../../helpers/formatters'
+import {HexToDec} from '../../helpers/formatters'
 import usePerson from "../../hooks/usePerson";
 import Button from "../UI/Button";
 import useCompany from "../../hooks/useCompany";
 import ModalCreateRequest from "./ModalCreateRequest";
+import Loader from "../UI/Loader";
 
 const Workers = () => {
     const [counterWorkers, setCounterWorkers] = useState();
@@ -15,6 +16,7 @@ const Workers = () => {
     const { FetchWorker } = usePerson();
     const [ showModal, setShowModal] = useState(false);
     const [ addressWorker, setAddressWorker ] = useState();
+    const [ show, setShow ] = useState(false);
 
     const addWorker = (data,item) => {
       setWorkers(prevItems => [...prevItems, {
@@ -55,53 +57,63 @@ const Workers = () => {
       setShowModal(true);
     }
 
+    useEffect(() => {
+      if(counterWorkers == workers.length)
+        setShow(true); 
+    },[workers])
+
 
     return (
         <>
-        {showModal && <ModalCreateRequest addressWorker={addressWorker} close={() => setShowModal(false)}></ModalCreateRequest>}
-        <div className="sm:grid md:grid-cols-2 lg:grid-cols-3 sm:w-full">
-            <div>
-              {workers.map( (item,k) => {
-                
-                const name = item.value[0];
-                const surname = item.value[1];
-                const age = HexToDec(item.value[2]);
-                const mobilePhone = item.value[3];
-                const CV = item.value[4];
-                const coverLetter = item.value[5];
-                const address = item.value[6];
+        {show ?
+          <>
+          {showModal && <ModalCreateRequest addressWorker={addressWorker} close={() => setShowModal(false)}></ModalCreateRequest>}
+          <div className="sm:grid md:grid-cols-2 lg:grid-cols-3 sm:w-full">
+              <div>
+                {workers.map( (item,k) => {
+                  
+                  const name = item.value[0];
+                  const surname = item.value[1];
+                  const age = HexToDec(item.value[2]);
+                  const mobilePhone = item.value[3];
+                  const CV = item.value[4];
+                  const coverLetter = item.value[5];
+                  const address = item.value[6];
 
-                return(
-                  <div className="w-full" key={k}>
-                    <div className="flex flex-col bg-white shadow-lg rounded-lg overflow-hidden text-black m-5">
-                        <div className="bg-gray-200 text-gray-700 text-lg px-6 py-4">
-                            <p className="font-bold">{name} {surname}</p>
-                            <p>Age: {age}</p>
-                        </div>
+                  return(
+                    <div className="w-full" key={k}>
+                      <div className="flex flex-col bg-white shadow-lg rounded-lg overflow-hidden text-black m-5">
+                          <div className="bg-gray-200 text-gray-700 text-lg px-6 py-4">
+                              <p className="font-bold">{name} {surname}</p>
+                              <p>Age: {age}</p>
+                          </div>
 
-                        <div className="px-6 py-4 border-t border-gray-200 text-black">
-                            <p>{coverLetter}</p>
-                        </div>
+                          <div className="px-6 py-4 border-t border-gray-200 text-black">
+                              <p>{coverLetter}</p>
+                          </div>
 
-                        <div className="bg-gray-200 px-6 py-4">
-                            <div className="flex">
-                                <Button>Show CV</Button>
-                                <Button onClick={(e) => OpenModal(e, k, address)}>Send Request</Button>
-                                <p>Phone: {mobilePhone} </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                )
-                
-              }
+                          <div className="bg-gray-200 px-6 py-4">
+                              <div className="flex">
+                                  <Button>Show CV</Button>
+                                  <Button onClick={(e) => OpenModal(e, k, address)}>Send Request</Button>
+                                  <p>Phone: {mobilePhone} </p>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  )
+                  
+                }
 
-              )}
-            </div>
-            {error && <p>{error.message}</p>}
-        </div>
+                )}
+              </div>
+              {error && <p>{error.message}</p>}
+          </div>
+        </>
+        : <Loader></Loader>}
       </>
     )
+    
 }
 
 export default Workers;

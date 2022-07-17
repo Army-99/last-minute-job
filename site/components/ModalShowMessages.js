@@ -2,7 +2,7 @@
 import Button from "./UI/Button";
 import { useState, useRef } from "react";
 import { useMoralis } from "react-moralis";
-import HexToDec from "../helpers/formatters";
+import {HexToDec} from "../helpers/formatters";
 import useRequest from "../hooks/useRequest";
 import Input from "./UI/Input"
 
