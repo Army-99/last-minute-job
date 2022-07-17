@@ -110,7 +110,9 @@ const Workers = () => {
               {error && <p>{error.message}</p>}
           </div>
         </>
-        : <Loader></Loader>}
+        : <div className="flex w-screen h-screen justify-center items-center">
+          <Loader></Loader>
+          </div>}
       </>
     )
     

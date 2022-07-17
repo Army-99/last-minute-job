@@ -54,7 +54,9 @@ const Applications = () => {
           show ?
           <ShowJobs jobs={jobs} applied={true} acceptJob={HandleAcceptJob} Loading={isLoading}></ShowJobs>
           :
-          <Loader></Loader>
+          <div className="flex w-screen h-screen justify-center items-center">
+            <Loader></Loader>
+          </div>
       }
   </div>
     );

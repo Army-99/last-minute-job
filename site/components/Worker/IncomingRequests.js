@@ -49,7 +49,11 @@ const IncomingRequest = () => {
 
     return(
         <>
-        {show ? <ShowRequests requests={requests}></ShowRequests> : <Loader></Loader>}
+        {show ? <ShowRequests requests={requests}></ShowRequests> 
+        : 
+        <div className="flex w-screen h-screen justify-center items-center">
+            <Loader></Loader>
+        </div>}
         </>
     )
 }

@@ -49,7 +49,9 @@ const ShowAllJobs = () => {
                 show ?
                 <ShowJobs jobs={jobs}></ShowJobs>
                 :
-                <Loader></Loader>
+                <div className="flex w-screen h-screen justify-center items-center">
+                    <Loader></Loader>
+                </div>
             }
         </div>
 

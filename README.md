@@ -15,12 +15,11 @@ FRONTEND:
 
   (All)
   Show worker already hired in jobs and hourly pay
-  Create a nice loader
   Improve UX and UI
   
  SMARTCONTRACT:
   Change visibility of the functions and variables
   remove the unnecessary functions
-  divide in 3 smart contracts at another time
+  divide in 3 smart contracts - JobsContract - RequestsContract - HUBContract (will do in a second version)
   
   
