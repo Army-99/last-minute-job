@@ -65,24 +65,26 @@ const ShowJobs = ({jobs, applied, acceptJob, Loading}) => {
                     let searching = item.value[9];
                     let counterCandidates = HexToDec(item.value[10]);
 
+                    console.log(workingAddress)
+
                     return(
                             <div className="flex flex-col bg-white shadow-lg rounded-lg overflow-hidden text-black m-5" key={k}>
                                 <div className="bg-gray-200 text-gray-700 text-lg px-6 py-4">
-                                    <p className="text-center">{title} - { item.close ? "FINISHED" : total + "ETH"} </p>
+                                    <p className="text-center">{title ? title : "Request Job"} - { item.close ? "FINISHED" : total + "ETH"} </p>
                                     {item.propose && <div className="flex"><p className="text-red-400">ATTENTION! You've been selected!</p><Button Loading={Loading} onClick={e => acceptJob(e, k)}>Accept the job</Button></div>}
                                     {item.applied && !item.hired && <div className="flex"><p className="text-blue-400">You're a candidate!</p></div>}
                                     {item.hired && <div className="flex"><p className="text-green-400">You're Hired!</p></div>}
-                                    <p>{workingAddress} ({searchingPosition})</p>
+                                    {workingAddress && <p>{workingAddress} ({searchingPosition})</p>}
                                     <p>Candidates: {counterCandidates}</p>
                                     <p>Searching for {peopleToHire} person</p>
                                     <p>Person hired N</p>
                                 </div>
 
-                                <div className="flex justify-between items-center px-6 py-4">
+                                <div className="justify-between items-center px-6 py-4">
                                 {searching ? <div className="bg-green-600 text-xs uppercase px-2 py-1 rounded-full border border-gray-200 text-gray-200 font-bold">Searching</div> 
-                                : <div className="bg-red-600 text-xs uppercase px-2 py-1 rounded-full border border-gray-200 text-gray-200 font-bold">Close search</div>}
+                                            : <div className="bg-red-600 text-xs uppercase px-2 py-1 rounded-full border border-gray-200 text-gray-200 font-bold justify-center flex">Search is Close</div>}
                                 {isPerson && !item.applied && !applied && <Button Loading={isLoading} onClick={e => HandleCandidate(e,k)}>Candidate</Button>}
-                                <div className="text-sm">{dateInit.getDate() + '/' + dateInit.getMonth() + '/' +dateInit.getFullYear()} - {dateFinish.getDate() + '/' + dateFinish.getMonth() + '/' +dateFinish.getFullYear()}</div>
+                                <div className="text-sm flex justify-center">{dateInit.getDate() + '/' + dateInit.getMonth() + '/' +dateInit.getFullYear()} - {dateFinish.getDate() + '/' + dateFinish.getMonth() + '/' +dateFinish.getFullYear()}</div>
                                 </div>
 
                                 <div className="px-6 py-4 border-t border-gray-200 text-black">

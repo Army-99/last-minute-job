@@ -96,7 +96,7 @@ const useRequest = () => {
         return await Moralis.executeFunction(options);
         }catch(err){
         console.error(err)
-        setError(err);
+        setErrorRequest(err);
         }
         setIsLoadingRequest(false);
         return null;
@@ -167,7 +167,30 @@ const useRequest = () => {
         return null;
     }
 
-  return { FetchCounterRequestCompany, ShowIDRequestCompany, FetchRequest, ShowCounterRequestsPerson, ShowIDRequestPerson, ShowMessages, SendMessage, isLoadingRequest, CloseRequest };
+            //SetAnswer(uint _nRequest, uint8 _status)
+    const SetAnswer = async(nrRequest, newStatus) => {
+        setIsLoadingRequest(true);
+        let options = {
+        contractAddress: ContractAddress,
+        functionName: "SetAnswer",
+        abi: contractABI,
+        params: {
+            _nRequest: nrRequest,
+            _status: newStatus
+        }
+        };
+        try{
+        const tx = await Moralis.executeFunction(options);
+        await tx.wait();
+        }catch(err){
+        console.error(err)
+        setErrorRequest(err);
+        }
+        setIsLoadingRequest(false);
+        return null;
+    }
+
+  return { FetchCounterRequestCompany, ShowIDRequestCompany, FetchRequest, ShowCounterRequestsPerson, ShowIDRequestPerson, ShowMessages, SendMessage, isLoadingRequest, CloseRequest, SetAnswer };
 
 }
 export default useRequest;

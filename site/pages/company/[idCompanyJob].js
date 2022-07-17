@@ -184,12 +184,12 @@ const ManageJob = () => {
             {
                 candidates.map((item,i) => { 
                     return(
-                       <Candidate item={item} isLoadingCompany={isLoadingCompany} proposeHire={e => HandleHireQuestion(e,i)} SetAbsentHours={ e => HandleSetAbsentHour(e,i)} refHoursAbsent={refHoursAbsent}></Candidate>
+                       <Candidate item={item} jobClose={jobClose} isLoadingCompany={isLoadingCompany} proposeHire={e => HandleHireQuestion(e,i)} SetAbsentHours={ e => HandleSetAbsentHour(e,i)} refHoursAbsent={refHoursAbsent}></Candidate>
                     )})
             }
             <div className="flex justify-center h-10">
                 {searching && <Button Loading={isLoading} onClick={(e) => CloseSearch(e,jobID)}>Close search</Button>}
-                {!searching && !jobClose && jobClose != null &&<Button Loading={isLoading} onClick={(e) => ClosePay(e,jobID)}>Close And Pay</Button>}
+                {!searching && !jobClose && jobClose != null && <Button Loading={isLoading} onClick={(e) => ClosePay(e,jobID)}>Close And Pay</Button>}
                 {error && <p className="text-red-500">ERROR {error.message}</p>}
             </div>
         </div>

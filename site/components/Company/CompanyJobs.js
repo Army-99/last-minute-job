@@ -24,6 +24,7 @@ const CompanyJobs = () => {
 
     useEffect(() => {
         const Fetch = async() => {
+            console.log(counterCompanyJobs)
             if(counterCompanyJobs>0)
             {
                 setJobs([]);

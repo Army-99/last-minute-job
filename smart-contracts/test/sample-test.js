@@ -18,7 +18,7 @@ describe("LastMinuteJob -- Contract Tests", function () {
     //console.log("Address Person2: " + person2.address);
 
     //Register company
-    await lastMinuteContract.connect(company).RegisterAsCompany("Nome", "Descrizione");
+    await lastMinuteContract.connect(company).RegisterAsCompany("Nome", "Descrizione", "Address");
     expect(await lastMinuteContract.GetCompaniesCounter()).to.equal(1);
 
     //Register person
@@ -26,6 +26,7 @@ describe("LastMinuteJob -- Contract Tests", function () {
     expect(await lastMinuteContract.GetPersonsCounter()).to.equal(1);
 
   });  
+  
   it("Create a job and finish the cycle with full payment to one person", async function () {
     //Create a job
     await lastMinuteContract.connect(company).CreateJob("Titolo", "Descrizione", "Working Address", "Chef", 840, 1320,1, 1656288000, 1656460800, { value: ethers.utils.parseEther("1") });
@@ -94,7 +95,7 @@ describe("LastMinuteJob -- Contract Tests", function () {
 
     //console.log(await lastMinuteContract.connect(person).ShowMessages(0));
 
-
+    //ACCEPT THE JOB
     await lastMinuteContract.connect(person).SetAnswer(0,2);
 
     await lastMinuteContract.connect(company).CloseRequest(0);

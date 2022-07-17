@@ -69,7 +69,7 @@ const ModalCreateRequest = ({addressWorker, close}) => {
             const dateInit = Math.floor(new Date(DateIRef.current.input.value).getTime() /1000);
             const dateFinish = Math.floor(new Date(DateFRef.current.input.value).getTime() /1000);
             CreateRequest(addressWorker, dateInit, dateFinish, hourInit,hourFinish, MessageRef.current.input.value )
-            close;
+            close();
         }
             
 

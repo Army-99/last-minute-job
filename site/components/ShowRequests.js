@@ -11,18 +11,27 @@ const ShowRequests = ({requests}) => {
     const { Moralis } = useMoralis();
     const { isPerson } = usePerson();
     const { isCompany } = useCompany();
-    const { CloseRequest, isLoadingRequest, ShowMessages } = useRequest();
+    const { CloseRequest, isLoadingRequest, ShowMessages, SetAnswer } = useRequest();
     const [ showModal, setShowModal] = useState(false);
     const [ messages, setMessages ] = useState([]);
+    const [nrRequest, setNrRequest] = useState();
+    const [active, setActive] = useState();
 
-    const HandleShowMessages = async(e, nrRequest) => {
+    const HandleShowMessages = async(e, nrRequest, isActive) => {
         e.preventDefault();
+        setNrRequest(nrRequest);
+        setActive(isActive);
         setMessages(await ShowMessages(nrRequest));
     }
 
     useEffect(() => {
-        if(messages.length>0)
+        
+        if(messages.length>0 && nrRequest>=0)
+        {
             setShowModal(true);
+
+        }
+        
     },[messages])
 
     const HandleCloseRequest = (e, nrRequest) => {
@@ -30,12 +39,18 @@ const ShowRequests = ({requests}) => {
         CloseRequest(nrRequest);
     }
 
+    const HandleSetAnswer = async(e, nrRequest, newStatus) => {
+        e.preventDefault();
+        await SetAnswer(nrRequest, newStatus);
+    }
+
  
     return(
-        <>
-            {showModal && <ModalShowMessages messages={messages} close={() => setShowModal(false)}></ModalShowMessages>}
+        <>  
+            {showModal && <ModalShowMessages nrRequest={nrRequest} active={active} messages={messages} close={() => setShowModal(false)}></ModalShowMessages>}
             <div className="sm:grid md:grid-cols-2 lg:grid-cols-3 sm:w-full">
                 {requests.map((item,k) => {
+                    
                     let nrRequest = item.nr;
                     let owner= item.value[0];
                     let destination=item.value[1];
@@ -59,11 +74,11 @@ const ShowRequests = ({requests}) => {
                         break;
                         }
                         case 1: {
-                            statusString = "Accepted";
+                            statusString = "Rejected";
                             break;
                         }
                         case 2: {
-                            statusString = "Rejected";
+                            statusString = "Accepted";
                             break;
                         }
                     }
@@ -73,7 +88,7 @@ const ShowRequests = ({requests}) => {
                         <div className="w-full" key={k}>
                         <div className="flex flex-col bg-white shadow-lg rounded-lg overflow-hidden text-black m-5">
                             <div className="bg-gray-200 text-gray-700 text-lg px-6 py-4">
-                                {isActive ? <p>Request is Open</p> : <p>Request is Close</p>}
+                                {isActive && <p>Request is Open</p>}
                                 <p className="font-bold">Destination {/*destination*/}</p>
                                 <div className="flex justify-between">
                                     <p>{dateFrom.getDate() + '/' + dateFrom.getMonth() + '/' +dateFrom.getFullYear()} - {dateTo.getDate() + '/' + dateTo.getMonth() + '/' +dateTo.getFullYear()}</p>
@@ -85,15 +100,16 @@ const ShowRequests = ({requests}) => {
                             </div>
 
                             <div className="px-6 py-4 border-t border-gray-200 text-black flex justify-between">
-                                <p>{statusString}</p>
-                                {isPerson && status==0 && <><Button>Accept</Button> <Button>Decline</Button></>}
+                                {isActive ? <p>{statusString}</p> : <p>Request is Close</p>}
+                                
+                                {isPerson && status==0 && isActive && <><Button Loading={isLoadingRequest} onClick={(e) => HandleSetAnswer(e,nrRequest,2) }>Accept</Button> <Button Loading={isLoadingRequest}  onClick={(e) => HandleSetAnswer(e,nrRequest,1) }>Decline</Button></>}
                                 {isCompany && isActive && <Button Loading={isLoadingRequest} onClick={(e) => HandleCloseRequest(e, nrRequest)}>Close</Button>}
                             </div>
 
                             <div className="bg-gray-200 px-6 py-4">
                                 <div className="flex justify-between">
                                     <p>{value} ETH</p>
-                                    <Button Loading={isLoadingRequest} onClick={ (e) => HandleShowMessages(e, nrRequest) }>Show messages</Button>
+                                    <Button Loading={isLoadingRequest} onClick={ (e) => HandleShowMessages(e, nrRequest, isActive) }>Show messages</Button>
                                 </div>
                             </div>
                         </div>

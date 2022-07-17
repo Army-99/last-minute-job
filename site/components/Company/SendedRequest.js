@@ -6,11 +6,9 @@ import ShowRequests from "../ShowRequests";
 
 const SendedRequest = () => {
     const { FetchCounterRequestCompany, ShowIDRequestCompany, FetchRequest, ShowMessages } = useRequest();
-    const { Moralis } = useMoralis();
     const [ requests, setRequests] = useState([]);
-    const [ messages, setMessages] = useState([]);
     const [counterRequest, setCounterRequest] = useState(null);
-    const [nrRequest, setNrRequest] = useState();
+    const [show, setShow] = useState(false);
 
     const addRequest = (data, nrRequest) => {
         setRequests(prevItems => [...prevItems, {
@@ -39,17 +37,19 @@ const SendedRequest = () => {
         FetchRequests();
     },[counterRequest])
 
-    useEffect(()=> {
-        const FetchMessage = async() => {
-            if(nrRequest)
-                setMessages(await ShowMessages(nrRequest));
-        }
-        FetchMessage();
-        
-    },[nrRequest])
+    useEffect(() => {
+        if(requests.length == counterRequest){ 
+            setShow(true);
+         }
+
+    },[requests])
 
     return(
-        <ShowRequests requests={requests} ></ShowRequests>
+        <>
+        {
+            show && <ShowRequests requests={requests} ></ShowRequests>
+        }
+        </>
     )
 }
 
