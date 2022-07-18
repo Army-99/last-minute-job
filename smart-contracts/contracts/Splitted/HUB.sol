@@ -11,7 +11,7 @@ interface InterfaceHUB {
     function CheckPerson(address sender) external view returns(bool);
     function GetCompaniesCounter() external view returns (uint);
     function GetPersonsCounter() external view returns (uint);
-    function ShowPerson(uint _nrWorker) external view returns(string memory, string memory, uint, string memory, string memory, string memory, address);
+    function ShowPerson(uint _nrWorker) external view returns(bytes32, bytes32, bytes32, bytes32, bytes32, bytes32);
     function ShowCompany(uint _nrCompany) external view returns(string memory, string memory, string memory);
     function ShowCompanyJobsCounter(address sender) external view returns(uint);
     function ShowAppliedJobsCounter(address sender) external view returns(uint);
@@ -41,12 +41,12 @@ contract HUB {
 
     struct Person{
         bool registered;
-        string name;
-        string surname;
-        uint age;
-        string mobilePhone;
-        string CV;
-        string coverLetter;
+        bytes32 name;
+        bytes32 surname;
+        bytes32 age;
+        bytes32 mobilePhone;
+        bytes32 CV;
+        bytes32 coverLetter;
         mapping(uint => uint) appliedJob;
         uint counterAppliedJob;
         mapping(uint => uint) incomingRequests;
@@ -64,8 +64,8 @@ contract HUB {
     mapping(uint => address) internal personsAddress;
     uint internal counterPersons;
 
-    address contractJOB;
-    address contractREQUEST;
+    address internal contractJOB;
+    address internal contractREQUEST;
 
     //To prevent the possibility that someone in addition to the contract job could add a job, same for request
     //ADD ONLY OWNER
@@ -114,7 +114,7 @@ contract HUB {
         emit ev_RegisterAsCompany(_name,sender);
     }
 
-    function CreatePerson(address sender, string memory _name,string memory _surname,uint _age,string memory _mobilePhone, string memory _CV, string memory _coverLetter) external{
+    function CreatePerson(address sender, bytes32 _name,bytes32 _surname,uint _age,bytes32 _mobilePhone, bytes32 _CV, bytes32 _coverLetter) external{
         require(!persons[sender].registered,"You're already registerd!");
         Person storage newPerson = persons[sender];
         newPerson.registered=true;
@@ -147,10 +147,9 @@ contract HUB {
         return(counterPersons);
     }
 
-    function ShowPerson(uint _nrWorker) external view returns(string memory, string memory, uint, string memory, string memory, string memory, address) {
+    function ShowPerson(uint _nrWorker) external view returns(bytes32, bytes32, bytes32, bytes32, bytes32, bytes32) {
         Person storage person = persons[personsAddress[_nrWorker]];
-        address wallet = personsAddress[_nrWorker];
-        return(person.name, person.surname, person.age, person.mobilePhone, person.CV, person.coverLetter, wallet);
+        return(person.name, person.surname, person.age, person.mobilePhone, person.CV, person.coverLetter);
     }
 
     function ShowCompany(uint _nrCompany) external view returns(string memory, string memory, string memory) {

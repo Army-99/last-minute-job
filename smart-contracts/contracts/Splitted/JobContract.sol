@@ -9,10 +9,10 @@ interface InterfaceJOB{
     function CreateJob (string memory _title,string memory _description,string memory _workingAddress,string memory _searchingPosition,uint _hourInit,uint _hourFinish,uint _peopleToHire,uint _dateFrom,uint _dateTo) external payable;
     function CheckPersonApplied(uint _nrJob) external view returns(bool); 
     function CheckPersonHired(uint _nrJob) external view returns(bool); 
-    function ApplyToJob(uint _nrJob, string _name, string _surname, string _mobilePhone, uint _age, string _CV, string _coverLetter) external; 
+    function ApplyToJob(address worker, uint _nrJob, string _name, string _surname, string _mobilePhone, uint _age, string _CV, string _coverLetter) external; 
     function RequestHire(uint _nrJob, uint _nrCandidate) external;
     function ShowIfHireQuestion(uint _nrJob) external view returns(bool);
-    function AcceptJob(uint _nrJob) external;
+    function AcceptJob(address worker,uint _nrJob) external;
     function ShowJobsCounter() external view returns(uint);
     function ShowJobSummary(uint _nrJob) external view returns( address,uint,string memory,string memory,string memory,string memory,uint, uint ,uint ,bool , uint );
     function ShowHired (uint _nrJob) external view returns(uint);
@@ -75,6 +75,12 @@ contract JobContract is ReentrancyGuard {
     mapping (uint => Job) internal jobs;
     uint internal counterJobs;
     address internal interfaceHUB;
+    address internal requestContract;
+
+    //ADD ONLY OWNER
+    function SetContractRequestAddress(address _requestContract) {
+        requestContract=_requestContract;
+    }
 
     bool internal locked;
 
@@ -161,14 +167,15 @@ contract JobContract is ReentrancyGuard {
         return (job.candidates[ job.candidatesUINT[msg.sender] ].hired);
     }
 
-    function ApplyToJob(uint _nrJob, string _name, string _surname, string _mobilePhone, uint _age, string _CV, string _coverLetter) onlyJobExist(_nrJob) onlyPerson external {
+    function ApplyToJob(address worker, uint _nrJob, string _name, string _surname, string _mobilePhone, uint _age, string _CV, string _coverLetter) onlyJobExist(_nrJob) onlyPerson external {
         Job storage job = jobs[_nrJob];
         require(!CheckPersonApplied(_nrJob),"Already Registered!");
+        require(worker == msg.sender || msg.sender == requestContract,"You're not allowed");
 
         Candidate storage newCandidate = job.candidates[job.counterCandidates];
             newCandidate.name=_name;
             newCandidate.surname=_surname;
-            newCandidate.wallet=payable(msg.sender);
+            newCandidate.wallet=payable(worker);
             newCandidate.mobilePhone=_mobilePhone;
             newCandidate.age=_age;
             newCandidate.CV=_CV;
@@ -177,15 +184,16 @@ contract JobContract is ReentrancyGuard {
             newCandidate.proposalHire=false;
             newCandidate.hired=false;
 
-        job.candidatesUINT[msg.sender]=job.counterCandidates;
+        job.candidatesUINT[worker]=job.counterCandidates;
         job.counterCandidates++;
         
         InterfaceHUB hub = InterfaceHUB(interfaceHUB);
-        hub.AddPersonJobApplied(msg.sender, _nrJob);
+        hub.AddPersonJobApplied(worker, _nrJob);
     }
 
-    function RequestHire(uint _nrJob, uint _nrCandidate) onlyJobOwner(_nrJob) external{
+    function RequestHire(uint _nrJob, uint _nrCandidate) external{
         Job storage job = jobs[_nrJob];
+        require(job.owner == msg.sender || msg.sender == requestContract,"You're not allowed");
         require(_nrCandidate<job.counterCandidates,"Canditate not found");
         job.candidates[_nrCandidate].proposalHire=true;
     }
@@ -196,18 +204,19 @@ contract JobContract is ReentrancyGuard {
         return( job.candidates[uintCandidate].proposalHire );
     }
 
-    function AcceptJob(uint _nrJob) onlyJobExist(_nrJob) external{
+    function AcceptJob(address worker, uint _nrJob) onlyJobExist(_nrJob) external{
+        require(worker == msg.sender || msg.sender == requestContract,"You're not allowed");
         Job storage job = jobs[_nrJob];
-        uint IDCandidate = job.candidatesUINT[msg.sender];
+        uint IDCandidate = job.candidatesUINT[worker];
         Candidate storage candidate = job.candidates[IDCandidate];
 
-        require(candidate.wallet==msg.sender,"You're not the candidate");
+        require(candidate.wallet==worker,"You're not the candidate");
         require(candidate.proposalHire,"Hire proposal not found");
         job.hired[job.counterHired]=candidate.wallet;
         candidate.hired=true;
         candidate.proposalHire=false;
         job.counterHired++;
-        emit ev_Hired(_nrJob, msg.sender);
+        emit ev_Hired(_nrJob, worker);
     }
 
     function ShowJobsCounter() external view returns(uint){
@@ -237,8 +246,9 @@ contract JobContract is ReentrancyGuard {
         return( job.candidates[_nrCandidate].absentHour);
     }
 
-    function CloseSearching(uint _nrJob) external onlyJobExist(_nrJob) onlyJobOwner(_nrJob){
+    function CloseSearching(uint _nrJob) external onlyJobExist(_nrJob) {
         Job storage job = jobs[_nrJob];
+        require(job.owner == msg.sender || msg.sender == requestContract,"You're not allowed");
         job.searching=false;
         emit ev_ClosedSearch(_nrJob);
     }
