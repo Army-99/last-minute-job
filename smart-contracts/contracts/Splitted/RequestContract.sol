@@ -138,7 +138,7 @@ contract RequestContract is ReentrancyGuard {
             InterfaceJOB job = InterfaceJOB(interfaceJOB);
             InterfaceHUB hub = InterfaceHUB(interfaceHUB);
             //CREATE JOB
-            job.CreateJob(msg.sender, request.title,request.description,request.workingAddress,request.searchingPosition,request.hourInit,request.hourFinish,1,request.dateFrom,request.dateTo){value:request.value};
+            job.CreateJob{value:request.value}(msg.sender, request.title,request.description,request.workingAddress,request.searchingPosition,request.hourInit,request.hourFinish,1,request.dateFrom,request.dateTo);
             //FETCH THE NEW JOB
             uint nrJob = hub.ShowJobIDCompany(msg.sender, hub.ShowCompanyJobsCounter(msg.sender)-1);
             //AUTO APPLY PERSON TO JOB 
