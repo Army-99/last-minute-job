@@ -5,17 +5,14 @@ describe("LastMinuteJob -- Contract Tests", function () {
   const provider = waffle.provider;
   let company, person, person2;
   let lastMinuteContract;
+  let HUBContract, JobContract, RequestContract;
   let Job;
 
   beforeEach(async () => {
     ([owner, company, person, person2] = await ethers.getSigners());
+
     const LastMinuteJob = await ethers.getContractFactory('LastMinuteJob');
     lastMinuteContract = await LastMinuteJob.deploy();
-    
-    //console.log("Address Owner: " + owner.address);
-    //console.log("Address Company: " + company.address);
-    //console.log("Address Person1: " + person.address);
-    //console.log("Address Person2: " + person2.address);
 
     //Register company
     await lastMinuteContract.connect(company).RegisterAsCompany("Nome", "Descrizione", "Address");
@@ -25,9 +22,36 @@ describe("LastMinuteJob -- Contract Tests", function () {
     await lastMinuteContract.connect(person).RegisterAsPerson("John","Doe",30,"123456789", "LINK", "Nice to meet you, I'm John Doe");
     expect(await lastMinuteContract.GetPersonsCounter()).to.equal(1);
 
-  });  
-  
+    const HUB = await ethers.getContractFactory('HUB');
+    HUBContract = await HUB.deploy();
+
+    const Job = await ethers.getContractFactory('JobContract');
+    JobContract = await Job.deploy(HUBContract.address);
+
+    const Request = await ethers.getContractFactory('RequestContract');
+    RequestContract = await Request.deploy(HUBContract.address,JobContract.address);
+    
+    //console.log("Address Owner: " + owner.address);
+    //console.log("Address Company: " + company.address);
+    //console.log("Address Person1: " + person.address);
+    //console.log("Address Person2: " + person2.address);
+
+    //Create company
+    await HUBContract.connect(company).CreateCompany("Nome", "Descrizione", "Address");
+    expect(await HUBContract.GetCompaniesCounter()).to.equal(1);
+
+    //Create worker
+    await HUBContract.connect(person).CreateWorker("John", "Doe", 30, "214564062", "LINKTOCV" , "Hi my name is John!");
+    expect(await HUBContract.GetWorkersCounter()).to.equal(1);
+
+  });
+
   it("Create a job and finish the cycle with full payment to one person", async function () {
+
+  })
+
+  /* OLD TESTS */
+  it("OLD Create a job and finish the cycle with full payment to one person", async function () {
     //Create a job
     await lastMinuteContract.connect(company).CreateJob("Titolo", "Descrizione", "Working Address", "Chef", 840, 1320,1, 1656288000, 1656460800, { value: ethers.utils.parseEther("1") });
       //Company Jobs Counter
@@ -76,16 +100,16 @@ describe("LastMinuteJob -- Contract Tests", function () {
       let AfterPayPerson = await provider.getBalance(person.address);
       let AfterPayCompany = await provider.getBalance(company.address);
 
-      console.log("Comapny before: " + BerforPayCompany);
-      console.log("Company After: " + AfterPayCompany);
-      console.log("Person before " + BerforPayPerson);
-      console.log("Person after: " + AfterPayPerson);
+      //console.log("Comapny before: " + BerforPayCompany);
+      //console.log("Company After: " + AfterPayCompany);
+      //console.log("Person before " + BerforPayPerson);
+      //console.log("Person after: " + AfterPayPerson);
 
       //console.log(await lastMinuteContract.connect(person).ShowJobSummary(0));
   
   });
 
-  it("Create request and accept" , async function () {
+  it("OLD Create request and accept" , async function () {
     await lastMinuteContract.connect(company).CreateRequest("0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", 1656288000, 1656460800,840, 1320, "Hi, join in my private work i'll pay you very well 1 eth for 8 hours for 5 day",{ value: ethers.utils.parseEther("1") });
     //console.log(await lastMinuteContract.connect(company).ShowRequest(0));
 
@@ -115,13 +139,11 @@ describe("LastMinuteJob -- Contract Tests", function () {
     let AfterPayPerson = await provider.getBalance(person.address);
     let AfterPayCompany = await provider.getBalance(company.address);
 
-    console.log("Comapny before: " + BerforPayCompany);
-    console.log("Company After: " + AfterPayCompany);
-    console.log("Person before " + BerforPayPerson);
-    console.log("Person after: " + AfterPayPerson);
+    //console.log("Comapny before: " + BerforPayCompany);
+    //console.log("Company After: " + AfterPayCompany);
+    //console.log("Person before " + BerforPayPerson);
+    //console.log("Person after: " + AfterPayPerson);
   });
-  
-
 });
 
 
