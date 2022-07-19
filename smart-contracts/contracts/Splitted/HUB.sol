@@ -11,7 +11,8 @@ interface InterfaceHUB {
     function CheckPerson(address sender) external view returns(bool);
     function GetCompaniesCounter() external view returns (uint);
     function GetPersonsCounter() external view returns (uint);
-    function ShowPerson(uint _nrWorker) external view returns(bytes32, bytes32, bytes32, bytes32, bytes32, bytes32);
+    function ShowPerson(address _address) external view returns(bytes32, bytes32, bytes32, bytes32, bytes32, bytes32);
+    function ShowPersonID(uint _nrWorker) external view returns(address);
     function ShowCompany(uint _nrCompany) external view returns(string memory, string memory, string memory);
     function ShowCompanyJobsCounter(address sender) external view returns(uint);
     function ShowAppliedJobsCounter(address sender) external view returns(uint);
@@ -54,7 +55,7 @@ contract HUB {
     }
 
     event ev_RegisterAsCompany(string,address);
-    event ev_RegisterAsPerson(string, string, address);
+    event ev_RegisterAsPerson(bytes32, bytes32, address);
 
     mapping(address => Company) internal companies;
     mapping(uint => address) internal companiesAddress;
@@ -69,11 +70,11 @@ contract HUB {
 
     //To prevent the possibility that someone in addition to the contract job could add a job, same for request
     //ADD ONLY OWNER
-    function SetContractJobAddress(address _contractJOB) {
+    function SetContractJobAddress(address _contractJOB) external{
         contractJOB=_contractJOB;
     }
 
-    function SetContractRequestAddress(address _contractREQUEST) {
+    function SetContractRequestAddress(address _contractREQUEST) external{
         contractREQUEST=_contractREQUEST;
     }
 
@@ -86,8 +87,6 @@ contract HUB {
         require(msg.sender == contractREQUEST,"Not contract REQUEST");
         _;
     }
-
-
 
     modifier onlyCompany(){
         require(companies[msg.sender].registered,"Not Company!");
@@ -114,7 +113,7 @@ contract HUB {
         emit ev_RegisterAsCompany(_name,sender);
     }
 
-    function CreatePerson(address sender, bytes32 _name,bytes32 _surname,uint _age,bytes32 _mobilePhone, bytes32 _CV, bytes32 _coverLetter) external{
+    function CreatePerson(address sender, bytes32 _name,bytes32 _surname,bytes32 _age,bytes32 _mobilePhone, bytes32 _CV, bytes32 _coverLetter) external{
         require(!persons[sender].registered,"You're already registerd!");
         Person storage newPerson = persons[sender];
         newPerson.registered=true;
@@ -136,6 +135,7 @@ contract HUB {
     }
 
     function CheckPerson(address sender) external view returns(bool){
+
         return(persons[sender].registered);
     }
 
@@ -147,13 +147,17 @@ contract HUB {
         return(counterPersons);
     }
 
-    function ShowPerson(uint _nrWorker) external view returns(bytes32, bytes32, bytes32, bytes32, bytes32, bytes32) {
-        Person storage person = persons[personsAddress[_nrWorker]];
+    function ShowPerson(address _address) external view returns(bytes32, bytes32, bytes32, bytes32, bytes32, bytes32) {
+        Person storage person = persons[_address];
         return(person.name, person.surname, person.age, person.mobilePhone, person.CV, person.coverLetter);
     }
 
+    function ShowPersonID(uint _nrWorker) external view returns(address) {
+        return(personsAddress[_nrWorker]);
+    }
+
     function ShowCompany(uint _nrCompany) external view returns(string memory, string memory, string memory) {
-        Company storage company = companies[personsAddress[_nrWorker]];
+        Company storage company = companies[ companiesAddress[_nrCompany] ];
         return(company.name,company.description,company.headquarters);
     }
 
@@ -180,7 +184,7 @@ contract HUB {
     }
 
     function ShowJobAppliedIDPerson(address sender, uint _nrJobApplied) external view returns(uint) {
-        require(_nrAppliedJob < persons[sender].counterAppliedJob,"Job not found");
+        require( _nrJobApplied < persons[sender].counterAppliedJob ,"Job not found");
         return (persons[sender].appliedJob[_nrJobApplied]);
     }
 
@@ -196,25 +200,25 @@ contract HUB {
 
     function AddCompanyJob(address sender, uint _jobID) external onlyJobContract{
         Company storage company = companies[sender];
-        company.jobs[company.counterJobs]=counterJobs;
+        company.jobs[company.counterJobs]=_jobID;
         company.counterJobs++;
     }
 
     function AddPersonJobApplied (address sender, uint _jobID) external onlyJobContract{
         Person storage person = persons[sender];
-        person.appliedJob[person.counterAppliedJob]=_nrJob;
+        person.appliedJob[person.counterAppliedJob]=_jobID;
         person.counterAppliedJob++;
     }
 
     function AddCompanyRequest(address sender, uint _jobID) external onlyRequestContract{
-        Company storage company = companies[msg.sender];
-        company.sendedRequests[company.counterSendedRequests] = counterRequests;
+        Company storage company = companies[sender];
+        company.sendedRequests[company.counterSendedRequests] = _jobID;
         company.counterSendedRequests++;
     }
 
-    function AddPersonRequest(address destination, uint _jobID) external onlyRequestContract{
+    function AddPersonRequest(address _destination, uint _jobID) external onlyRequestContract{
         Person storage destination = persons[_destination];
-        destination.incomingRequests[destination.counterIncomingRequests] = counterRequests;
+        destination.incomingRequests[destination.counterIncomingRequests] = _jobID;
         destination.counterIncomingRequests++;
     }
 }

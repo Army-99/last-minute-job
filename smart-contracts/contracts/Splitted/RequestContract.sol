@@ -19,6 +19,7 @@ contract RequestContract is ReentrancyGuard {
         string title;
         string description;
         string workingAddress;
+        string searchingPosition;
         uint hourInit;
         uint hourFinish;
         uint dateFrom;
@@ -71,9 +72,9 @@ contract RequestContract is ReentrancyGuard {
         _;
     }
 
-    function CreateRequest(address _destination,string _title,string description, string workingAddress,uint _hourInit,uint _hourFinish, uint _dateFrom, uint _dateTo, string memory _message) external payable onlyCompany{
+    function CreateRequest(address _destination,string memory _title,string memory description, string memory workingAddress,uint _hourInit,uint _hourFinish, uint _dateFrom, uint _dateTo, string memory _message) external payable onlyCompany{
         require(msg.value>0,"You must create a request with value");
-        require(_hourStart>0 && _hourFinish>_hourStart && _dateFrom>0 && _dateTo>_dateFrom,"The inputs are incorrects");
+        require(_hourInit>0 && _hourFinish>_hourInit && _dateFrom>0 && _dateTo>_dateFrom,"The inputs are incorrects");
         
         Request storage newRequest = requests[counterRequests];
             newRequest.owner=payable(msg.sender);
@@ -81,7 +82,7 @@ contract RequestContract is ReentrancyGuard {
             newRequest.dateFrom=_dateFrom;
             newRequest.dateTo=_dateTo;
             newRequest.value=msg.value;
-            newRequest.hourStart=_hourStart;
+            newRequest.hourInit=_hourInit;
             newRequest.hourFinish=_hourFinish;
             newRequest.status=0;
             newRequest.isActive=true;
@@ -126,38 +127,56 @@ contract RequestContract is ReentrancyGuard {
         request.status=_status;
     }
 
+    /*TO RESOLVE STACK TOO DEEP*/ 
     function CloseRequest(uint _nRequest) requestExist(_nRequest) nonReentrant external {
-        Request storage request = requests[_nRequest];
-        require(request.isActive);
-        require(request.owner == msg.sender);
-        if(request.status==2){
-            uint hoursDaily = (request.hourFinish - request.hourStart) / 60; 
-            uint daysJob = ( request.dateTo - request.dateFrom ) / 60 / 60 / 24;
-            uint hourlyWage = request.value / daysJob / hoursDaily;
+        Request memory request = requests[_nRequest];
+        bool isActive = request.isActive;
+        address payable owner = request.owner;
+        require(isActive);
+        require(owner == msg.sender);
+
+        uint status = request.status; 
+        string memory tit=request.title;
+        string memory desc=request.description;
+        string memory wAdd=request.workingAddress;
+        string memory sPos=request.searchingPosition;
+        uint hInit = request.hourInit;
+        uint hFinish = request.hourFinish;
+        uint dFrom = request.dateFrom;
+        uint dTo = request.dateTo;
+        uint val = request.value;
+        address dest = request.destination;
+        
+        if(status==2){
+            uint hoursDaily = (hFinish - hInit) / 60; 
+            uint daysJob = ( dTo - dFrom ) / 60 / 60 / 24;
+            uint hourlyWage = val / daysJob / hoursDaily;
             
             InterfaceJOB job = InterfaceJOB(interfaceJOB);
             InterfaceHUB hub = InterfaceHUB(interfaceHUB);
+            
             //CREATE JOB
-            job.CreateJob{value:request.value}(msg.sender, request.title,request.description,request.workingAddress,request.searchingPosition,request.hourInit,request.hourFinish,1,request.dateFrom,request.dateTo);
+            job.CreateJob{value:val}(payable(msg.sender),tit,desc,wAdd,sPos,hInit,hFinish,1,dFrom,dTo);
             //FETCH THE NEW JOB
             uint nrJob = hub.ShowJobIDCompany(msg.sender, hub.ShowCompanyJobsCounter(msg.sender)-1);
             //AUTO APPLY PERSON TO JOB 
-            bytes32 (name, surname, age, mobilePhone, CV, coverLetter) = hub.ShowPerson(_nrWorker);
-            job.ApplyToJob(request.destination, nrJob, name, surname, mobilePhone, age, CV, coverLetter);
+
+            (bytes32 name, bytes32 surname,bytes32 age,bytes32 mobilePhone,bytes32 CV,bytes32 coverLetter) = hub.ShowPerson( dest );
+            job.ApplyToJob(dest, nrJob, Bytes32ToString(name), Bytes32ToString(surname), Bytes32ToString(mobilePhone), uint(age), Bytes32ToString(CV), Bytes32ToString(coverLetter));
             //AUTO REQUEST HIRE THE PERSON IN 0 POSITION (IS THE FIRST AND LAST CANDIDATE)
             job.RequestHire(hub.ShowCompanyJobsCounter(msg.sender)-1, 0);
             //PERSON AUTO ACCEPT THE JOB
-            job.AcceptJob(request.destination, _nrJob);
+            job.AcceptJob(dest, nrJob);
             //CLOSE SEARCH
-            job.CloseSearching(hub.ShowCompanyJobsCounter(msg.sender)-1);
-
-            request.isActive=false;
+            job.CloseSearching(nrJob);
+            
+            DeactivateRequest(_nRequest);
         }else{
-            request.isActive=false;
-            request.owner.transfer(request.value);
+            DeactivateRequest(_nRequest);
+            owner.transfer(val);
         }
 
-        emit ev_CloseRequest(_nRequest, request.status);
+        emit ev_CloseRequest(_nRequest, status);
     }
 
     function ShowCounterRequests() external view returns(uint) {
@@ -167,6 +186,26 @@ contract RequestContract is ReentrancyGuard {
     function ShowRequest(uint _nrRequest) requestExist(_nrRequest) external view returns(address, address, uint, uint,uint,uint,uint, uint8, bool) {
         Request storage request = requests[_nrRequest];
         require(request.owner == msg.sender || request.destination==msg.sender, "You're not allowed to read the request");
-        return(request.owner, request.destination, request.dateFrom, request.dateTo,request.value,request.hourStart,request.hourFinish, request.status, request.isActive);
+        return(request.owner, request.destination, request.dateFrom, request.dateTo,request.value,request.hourInit,request.hourFinish, request.status, request.isActive);
     }
+
+    //ONLY OWNER REQUEST
+    function DeactivateRequest(uint _nrRequest) requestExist(_nrRequest) internal {
+        Request storage request = requests[_nrRequest];
+        require(request.owner == msg.sender);
+        request.isActive=false;
+    }
+
+    function Bytes32ToString(bytes32 _bytes32) internal pure returns (string memory) {
+        uint8 i = 0;
+        while(i < 32 && _bytes32[i] != 0) {
+            i++;
+        }
+        bytes memory bytesArray = new bytes(i);
+        for (i = 0; i < 32 && _bytes32[i] != 0; i++) {
+            bytesArray[i] = _bytes32[i];
+        }
+        return string(bytesArray);
+    }
+
 }

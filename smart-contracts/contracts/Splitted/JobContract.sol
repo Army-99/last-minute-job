@@ -6,10 +6,10 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./HUB.sol";
 
 interface InterfaceJOB{
-    function CreateJob (string memory _title,string memory _description,string memory _workingAddress,string memory _searchingPosition,uint _hourInit,uint _hourFinish,uint _peopleToHire,uint _dateFrom,uint _dateTo) external payable;
-    function CheckPersonApplied(uint _nrJob) external view returns(bool); 
+    function CreateJob (address payable _owner, string memory _title,string memory _description,string memory _workingAddress,string memory _searchingPosition,uint _hourInit,uint _hourFinish,uint _peopleToHire,uint _dateFrom,uint _dateTo) external payable;
+    function CheckPersonApplied(uint _nrJob) external view returns(bool);
     function CheckPersonHired(uint _nrJob) external view returns(bool); 
-    function ApplyToJob(address worker, uint _nrJob, string _name, string _surname, string _mobilePhone, uint _age, string _CV, string _coverLetter) external; 
+    function ApplyToJob(address worker, uint _nrJob, string memory _name, string memory _surname, string memory _mobilePhone, uint _age, string memory _CV, string memory _coverLetter) external; 
     function RequestHire(uint _nrJob, uint _nrCandidate) external;
     function ShowIfHireQuestion(uint _nrJob) external view returns(bool);
     function AcceptJob(address worker,uint _nrJob) external;
@@ -78,7 +78,7 @@ contract JobContract is ReentrancyGuard {
     address internal requestContract;
 
     //ADD ONLY OWNER
-    function SetContractRequestAddress(address _requestContract) {
+    function SetContractRequestAddress(address _requestContract) external{
         requestContract=_requestContract;
     }
 
@@ -157,7 +157,7 @@ contract JobContract is ReentrancyGuard {
         emit ev_CreateJob(msg.sender, msg.value);
     }
 
-    function CheckPersonApplied(uint _nrJob) onlyJobExist(_nrJob) onlyPerson external view returns(bool) {
+    function CheckPersonApplied(uint _nrJob) onlyJobExist(_nrJob) onlyPerson public view returns(bool) {
         Job storage job = jobs[_nrJob];
         return(job.candidates[ job.candidatesUINT[msg.sender] ].wallet==msg.sender);
     }
@@ -167,7 +167,7 @@ contract JobContract is ReentrancyGuard {
         return (job.candidates[ job.candidatesUINT[msg.sender] ].hired);
     }
 
-    function ApplyToJob(address worker, uint _nrJob, string _name, string _surname, string _mobilePhone, uint _age, string _CV, string _coverLetter) onlyJobExist(_nrJob) onlyPerson external {
+    function ApplyToJob(address worker, uint _nrJob, string memory _name, string memory _surname, string memory _mobilePhone, uint _age, string memory _CV, string memory _coverLetter) onlyJobExist(_nrJob) onlyPerson external {
         Job storage job = jobs[_nrJob];
         require(!CheckPersonApplied(_nrJob),"Already Registered!");
         require(worker == msg.sender || msg.sender == requestContract,"You're not allowed");
