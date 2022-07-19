@@ -143,8 +143,10 @@ contract RequestContract is ReentrancyGuard {
             uint nrJob = hub.ShowJobIDCompany(msg.sender, hub.ShowCompanyJobsCounter(msg.sender)-1);
             //AUTO APPLY Worker TO JOB 
 
-            (bytes32 name, bytes32 surname,bytes32 age,bytes32 mobilePhone,bytes32 CV,bytes32 coverLetter) = hub.ShowWorker( dest );
-            job.ApplyToJob(dest, nrJob, Bytes32ToString(name), Bytes32ToString(surname), Bytes32ToString(mobilePhone), uint(age), Bytes32ToString(CV), Bytes32ToString(coverLetter));
+            bytes memory data = hub.ShowWorker( dest );
+            (string memory name,string memory surname,uint age,string memory mobilePhone,string memory CV,string memory coverLetter) = abi.decode(data, (string, string, uint, string, string, string));
+             
+            job.ApplyToJob(dest, nrJob, name, surname, mobilePhone, age, CV, coverLetter);
 
             //AUTO REQUEST HIRE THE Worker IN 0 POSITION (IS THE FIRST AND LAST CANDIDATE)
             job.RequestHire(hub.ShowCompanyJobsCounter(msg.sender)-1, 0);
@@ -183,17 +185,4 @@ contract RequestContract is ReentrancyGuard {
         require(request.owner == msg.sender);
         request.isActive=false;
     }
-
-    function Bytes32ToString(bytes32 _bytes32) internal pure returns (string memory) {
-        uint8 i = 0;
-        while(i < 32 && _bytes32[i] != 0) {
-            i++;
-        }
-        bytes memory bytesArray = new bytes(i);
-        for (i = 0; i < 32 && _bytes32[i] != 0; i++) {
-            bytesArray[i] = _bytes32[i];
-        }
-        return string(bytesArray);
-    }
-
 }

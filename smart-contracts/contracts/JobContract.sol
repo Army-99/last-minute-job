@@ -7,8 +7,8 @@ import "./HUB.sol";
 
 interface InterfaceJOB{
     function CreateJob (address payable _owner, string memory _title,string memory _description,string memory _workingAddress,string memory _searchingPosition,uint _hourInit,uint _hourFinish,uint _peopleToHire,uint _dateFrom,uint _dateTo) external payable;
-    function CheckWorkerApplied(uint _nrJob) external view returns(bool);
-    function CheckWorkerHired(uint _nrJob) external view returns(bool); 
+    function CheckPersonApplied(uint _nrJob) external view returns(bool);
+    function CheckPersonHired(uint _nrJob) external view returns(bool); 
     function ApplyToJob(address worker, uint _nrJob, string memory _name, string memory _surname, string memory _mobilePhone, uint _age, string memory _CV, string memory _coverLetter) external; 
     function RequestHire(uint _nrJob, uint _nrCandidate) external;
     function ShowIfHireQuestion(uint _nrJob) external view returns(bool);

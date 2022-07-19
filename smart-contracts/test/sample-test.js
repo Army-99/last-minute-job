@@ -4,11 +4,24 @@ const { ethersm,waffle } = require("hardhat");
 describe("LastMinuteJob -- Contract Tests", function () {
   const provider = waffle.provider;
   let company, person, person2;
-  let HUBContract, JobContract, RequestContract ;
+  let lastMinuteContract;
+  let HUBContract, JobContract, RequestContract;
   let Job;
 
   beforeEach(async () => {
     ([owner, company, person, person2] = await ethers.getSigners());
+
+    const LastMinuteJob = await ethers.getContractFactory('LastMinuteJob');
+    lastMinuteContract = await LastMinuteJob.deploy();
+
+    //Register company
+    await lastMinuteContract.connect(company).RegisterAsCompany("Nome", "Descrizione", "Address");
+    expect(await lastMinuteContract.GetCompaniesCounter()).to.equal(1);
+
+    //Register person
+    await lastMinuteContract.connect(person).RegisterAsPerson("John","Doe",30,"123456789", "LINK", "Nice to meet you, I'm John Doe");
+    expect(await lastMinuteContract.GetPersonsCounter()).to.equal(1);
+
     const HUB = await ethers.getContractFactory('HUB');
     HUBContract = await HUB.deploy();
 
@@ -23,12 +36,12 @@ describe("LastMinuteJob -- Contract Tests", function () {
     //console.log("Address Person1: " + person.address);
     //console.log("Address Person2: " + person2.address);
 
-    //Create company CreateCompany(string memory _name, string memory _description, string memory _address) external;
+    //Create company
     await HUBContract.connect(company).CreateCompany("Nome", "Descrizione", "Address");
     expect(await HUBContract.GetCompaniesCounter()).to.equal(1);
 
-    //Create worker function CreateWorker(bytes32 _name,bytes32 _surname,bytes32 _age,bytes32 _mobilePhone, bytes32 _CV, bytes32 _coverLetter) external;
-    await HUBContract.connect(person).CreateWorker(0x4a6f686e00000000000000000000000000000000000000000000000000000000,0x446f650000000000000000000000000000000000000000000000000000000000,0x1e00000000000000000000000000000000000000000000000000000000000000,0x75bcd15000000000000000000000000000000000000000000000000000000000, 0x687474703a2f2f4c494e4b544f43562e69740000000000000000000000000000, 0x4869206d79206e616d65206973204a6f686e0000000000000000000000000000);
+    //Create worker
+    await HUBContract.connect(person).CreateWorker("John", "Doe", 30, "214564062", "LINKTOCV" , "Hi my name is John!");
     expect(await HUBContract.GetWorkersCounter()).to.equal(1);
 
   });
@@ -37,8 +50,8 @@ describe("LastMinuteJob -- Contract Tests", function () {
 
   })
 
-  /* OLD TESTS
-  it("Create a job and finish the cycle with full payment to one person", async function () {
+  /* OLD TESTS */
+  it("OLD Create a job and finish the cycle with full payment to one person", async function () {
     //Create a job
     await lastMinuteContract.connect(company).CreateJob("Titolo", "Descrizione", "Working Address", "Chef", 840, 1320,1, 1656288000, 1656460800, { value: ethers.utils.parseEther("1") });
       //Company Jobs Counter
@@ -87,16 +100,16 @@ describe("LastMinuteJob -- Contract Tests", function () {
       let AfterPayPerson = await provider.getBalance(person.address);
       let AfterPayCompany = await provider.getBalance(company.address);
 
-      console.log("Comapny before: " + BerforPayCompany);
-      console.log("Company After: " + AfterPayCompany);
-      console.log("Person before " + BerforPayPerson);
-      console.log("Person after: " + AfterPayPerson);
+      //console.log("Comapny before: " + BerforPayCompany);
+      //console.log("Company After: " + AfterPayCompany);
+      //console.log("Person before " + BerforPayPerson);
+      //console.log("Person after: " + AfterPayPerson);
 
       //console.log(await lastMinuteContract.connect(person).ShowJobSummary(0));
   
   });
 
-  it("Create request and accept" , async function () {
+  it("OLD Create request and accept" , async function () {
     await lastMinuteContract.connect(company).CreateRequest("0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", 1656288000, 1656460800,840, 1320, "Hi, join in my private work i'll pay you very well 1 eth for 8 hours for 5 day",{ value: ethers.utils.parseEther("1") });
     //console.log(await lastMinuteContract.connect(company).ShowRequest(0));
 
@@ -126,13 +139,11 @@ describe("LastMinuteJob -- Contract Tests", function () {
     let AfterPayPerson = await provider.getBalance(person.address);
     let AfterPayCompany = await provider.getBalance(company.address);
 
-    console.log("Comapny before: " + BerforPayCompany);
-    console.log("Company After: " + AfterPayCompany);
-    console.log("Person before " + BerforPayPerson);
-    console.log("Person after: " + AfterPayPerson);
+    //console.log("Comapny before: " + BerforPayCompany);
+    //console.log("Company After: " + AfterPayCompany);
+    //console.log("Person before " + BerforPayPerson);
+    //console.log("Person after: " + AfterPayPerson);
   });
-  */
-
 });
 
 

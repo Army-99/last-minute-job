@@ -8,12 +8,12 @@ interface InterfaceHUB {
     function SetContractJobAddress(address _contractJOB) external;
     function SetContractRequestAddress(address _contractREQUEST) external;
     function CreateCompany(string memory _name, string memory _description, string memory _address) external;
-    function CreateWorker(bytes32 _name,bytes32 _surname,bytes32 _age,bytes32 _mobilePhone, bytes32 _CV, bytes32 _coverLetter) external;
+    function CreateWorker(string memory _name,string memory _surname,uint _age,string memory _mobilePhone, string memory _CV, string memory _coverLetter) external;
     function CheckCompany(address sender) external view returns(bool);
     function CheckWorker(address sender) external view returns(bool);
     function GetCompaniesCounter() external view returns (uint);
     function GetWorkersCounter() external view returns (uint);
-    function ShowWorker(address _address) external view returns(bytes32, bytes32, bytes32, bytes32, bytes32, bytes32);
+    function ShowWorker(address _address) external view returns(bytes memory);
     function ShowWorkerID(uint _nrWorker) external view returns(address);
     function ShowCompany(uint _nrCompany) external view returns(string memory, string memory, string memory);
     function ShowCompanyJobsCounter(address sender) external view returns(uint);
@@ -44,12 +44,12 @@ contract HUB is Ownable{
 
     struct Worker{
         bool registered;
-        bytes32 name;
-        bytes32 surname;
-        bytes32 age;
-        bytes32 mobilePhone;
-        bytes32 CV;
-        bytes32 coverLetter;
+        bytes name;
+        bytes surname;
+        bytes age;
+        bytes mobilePhone;
+        bytes CV;
+        bytes coverLetter;
         mapping(uint => uint) appliedJob;
         uint counterAppliedJob;
         mapping(uint => uint) incomingRequests;
@@ -57,7 +57,7 @@ contract HUB is Ownable{
     }
 
     event ev_RegisterAsCompany(string,address);
-    event ev_RegisterAsPerson(bytes32, bytes32, address);
+    event ev_RegisterAsPerson(string, string, address);
 
     mapping(address => Company) internal companies;
     mapping(uint => address) internal companiesAddress;
@@ -104,17 +104,24 @@ contract HUB is Ownable{
         emit ev_RegisterAsCompany(_name,msg.sender);
     }
 
-    function CreateWorker(bytes32 _name,bytes32 _surname,bytes32 _age,bytes32 _mobilePhone, bytes32 _CV, bytes32 _coverLetter) external{
+    function CreateWorker(string memory _name,string memory _surname,uint _age,string memory _mobilePhone, string memory _CV, string memory _coverLetter) external{
         require(!workers[msg.sender].registered,"You're already registerd!");
+        //Converted in Bytes32 to pass parameters to CloseRequest in RequestContract
+        bytes memory name = abi.encode(_name);
+        bytes memory surname = abi.encode(_surname);
+        bytes memory age = abi.encode(_age);
+        bytes memory mobilePhone = abi.encode(_mobilePhone);
+        bytes memory CV = abi.encode(_CV);
+        bytes memory coverLetter = abi.encode(_coverLetter);
 
         Worker storage newPerson = workers[msg.sender];
         newPerson.registered=true;
-        newPerson.name=_name;
-        newPerson.surname=_surname;
-        newPerson.age=_age;
-        newPerson.mobilePhone=_mobilePhone;
-        newPerson.CV=_CV;
-        newPerson.coverLetter=_coverLetter;
+        newPerson.name=name;
+        newPerson.surname=surname;
+        newPerson.age=age;
+        newPerson.mobilePhone=mobilePhone;
+        newPerson.CV=CV;
+        newPerson.coverLetter=coverLetter;
 
         workersAddress[counterworkers]=msg.sender;
         counterworkers++;
@@ -139,9 +146,9 @@ contract HUB is Ownable{
         return(counterworkers);
     }
 
-    function ShowWorker(address _address) external view returns(bytes32, bytes32, bytes32, bytes32, bytes32, bytes32) {
+    function ShowWorker(address _address) external view returns(bytes memory) {
         Worker storage person = workers[_address];
-        return(person.name, person.surname, person.age, person.mobilePhone, person.CV, person.coverLetter);
+        return (abi.encode(person.name, person.surname, person.age, person.mobilePhone, person.CV, person.coverLetter));
     }
 
     function ShowWorkerID(uint _nrWorker) external view returns(address) {
@@ -214,3 +221,4 @@ contract HUB is Ownable{
         destination.counterIncomingRequests++;
     }
 }
+
