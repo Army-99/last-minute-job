@@ -4,29 +4,40 @@ const { ethersm,waffle } = require("hardhat");
 describe("LastMinuteJob -- Contract Tests", function () {
   const provider = waffle.provider;
   let company, person, person2;
-  let lastMinuteContract;
+  let HUBContract, JobContract, RequestContract ;
   let Job;
 
   beforeEach(async () => {
     ([owner, company, person, person2] = await ethers.getSigners());
-    const LastMinuteJob = await ethers.getContractFactory('LastMinuteJob');
-    lastMinuteContract = await LastMinuteJob.deploy();
+    const HUB = await ethers.getContractFactory('HUB');
+    HUBContract = await HUB.deploy();
+
+    const Job = await ethers.getContractFactory('JobContract');
+    JobContract = await Job.deploy(HUBContract.address);
+
+    const Request = await ethers.getContractFactory('RequestContract');
+    RequestContract = await Request.deploy(HUBContract.address,JobContract.address);
     
     //console.log("Address Owner: " + owner.address);
     //console.log("Address Company: " + company.address);
     //console.log("Address Person1: " + person.address);
     //console.log("Address Person2: " + person2.address);
 
-    //Register company
-    await lastMinuteContract.connect(company).RegisterAsCompany("Nome", "Descrizione", "Address");
-    expect(await lastMinuteContract.GetCompaniesCounter()).to.equal(1);
+    //Create company CreateCompany(string memory _name, string memory _description, string memory _address) external;
+    await HUBContract.connect(company).CreateCompany("Nome", "Descrizione", "Address");
+    expect(await HUBContract.GetCompaniesCounter()).to.equal(1);
 
-    //Register person
-    await lastMinuteContract.connect(person).RegisterAsPerson("John","Doe",30,"123456789", "LINK", "Nice to meet you, I'm John Doe");
-    expect(await lastMinuteContract.GetPersonsCounter()).to.equal(1);
+    //Create worker function CreateWorker(bytes32 _name,bytes32 _surname,bytes32 _age,bytes32 _mobilePhone, bytes32 _CV, bytes32 _coverLetter) external;
+    await HUBContract.connect(person).CreateWorker(0x4a6f686e00000000000000000000000000000000000000000000000000000000,0x446f650000000000000000000000000000000000000000000000000000000000,0x1e00000000000000000000000000000000000000000000000000000000000000,0x75bcd15000000000000000000000000000000000000000000000000000000000, 0x687474703a2f2f4c494e4b544f43562e69740000000000000000000000000000, 0x4869206d79206e616d65206973204a6f686e0000000000000000000000000000);
+    expect(await HUBContract.GetWorkersCounter()).to.equal(1);
 
-  });  
-  
+  });
+
+  it("Create a job and finish the cycle with full payment to one person", async function () {
+
+  })
+
+  /* OLD TESTS
   it("Create a job and finish the cycle with full payment to one person", async function () {
     //Create a job
     await lastMinuteContract.connect(company).CreateJob("Titolo", "Descrizione", "Working Address", "Chef", 840, 1320,1, 1656288000, 1656460800, { value: ethers.utils.parseEther("1") });
@@ -120,7 +131,7 @@ describe("LastMinuteJob -- Contract Tests", function () {
     console.log("Person before " + BerforPayPerson);
     console.log("Person after: " + AfterPayPerson);
   });
-  
+  */
 
 });
 
