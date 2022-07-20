@@ -3,19 +3,20 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "./HUB.sol";
 
 interface InterfaceJOB{
     function CreateJob (address payable _owner, string memory _title,string memory _description,string memory _workingAddress,string memory _searchingPosition,uint _hourInit,uint _hourFinish,uint _peopleToHire,uint _dateFrom,uint _dateTo) external payable;
-    function CheckPersonApplied(uint _nrJob) external view returns(bool);
-    function CheckPersonHired(uint _nrJob) external view returns(bool); 
+    function CheckWorkerApplied(uint _nrJob) external view returns(bool);
+    function CheckWorkerHired(uint _nrJob) external view returns(bool);
     function ApplyToJob(address worker, uint _nrJob, string memory _name, string memory _surname, string memory _mobilePhone, uint _age, string memory _CV, string memory _coverLetter) external; 
     function RequestHire(uint _nrJob, uint _nrCandidate) external;
     function ShowIfHireQuestion(uint _nrJob) external view returns(bool);
     function AcceptJob(address worker,uint _nrJob) external;
     function ShowJobsCounter() external view returns(uint);
     function ShowJobSummary(uint _nrJob) external view returns( address,uint,string memory,string memory,string memory,string memory,uint, uint ,uint ,bool , uint );
-    function ShowHired (uint _nrJob) external view returns(uint);
+    function ShowHiredCounter (uint _nrJob) external view returns(uint);
     function ShowJobCandidatesCounter(uint _nrJob) external view returns(uint);
     function ShowJobCandidate(uint _nrJob, uint _nrCandidate) external view returns(string memory, string memory, string memory, uint, string memory, string memory, bool, bool);
     function ShowAbsentHoursCandidate(uint _nrJob, uint _nrCandidate) external view returns(uint);
@@ -25,7 +26,7 @@ interface InterfaceJOB{
     function ShowCloseJob(uint _nrJob) external view returns(bool);
 }
 
-contract JobContract is ReentrancyGuard {
+contract JobContract is ReentrancyGuard, Ownable {
 
     constructor (address _interfaceHUB) {
         interfaceHUB=_interfaceHUB;
@@ -78,8 +79,7 @@ contract JobContract is ReentrancyGuard {
     address internal requestContract;
     bool internal locked;
 
-    //ADD ONLY OWNER
-    function SetContractRequestAddress(address _requestContract) external{
+    function SetContractRequestAddress(address _requestContract) external onlyOwner{
         requestContract=_requestContract;
     }
 
@@ -122,13 +122,13 @@ contract JobContract is ReentrancyGuard {
         _;
     }
 
-    function CreateJob (address payable _owner, string memory _title,string memory _description,string memory _workingAddress,string memory _searchingPosition,uint _hourInit,uint _hourFinish,uint _peopleToHire,uint _dateFrom,uint _dateTo) external payable onlyCompany{
+    function CreateJob (address payable _owner, string memory _title,string memory _description,string memory _workingAddress,string memory _searchingPosition,uint _hourInit,uint _hourFinish,uint _peopleToHire,uint _dateFrom,uint _dateTo) external payable{
+        InterfaceHUB hub = InterfaceHUB(interfaceHUB);
+        require(hub.CheckCompany(msg.sender) || msg.sender == requestContract,"You're not allowed");
         require(msg.value>0,"Value of message is null");
         require(_hourInit>0 && _hourFinish>_hourInit && _dateFrom>0 && _dateTo>_dateFrom && _peopleToHire>0,"Error on inputs");
 
-        uint hoursDaily = (_hourFinish - _hourInit) / 60; 
-        uint daysJob = (_dateTo - _dateFrom) / 60 / 60 / 24;
-        uint _hourlyWage = msg.value / daysJob / hoursDaily / _peopleToHire;
+        uint _hourlyWage = msg.value / ((_dateTo - _dateFrom) / 60 / 60 / 24) / ((_hourFinish - _hourInit) / 60) / _peopleToHire;
 
         Job storage newJob = jobs[counterJobs];
             newJob.owner=_owner;
@@ -148,16 +148,17 @@ contract JobContract is ReentrancyGuard {
             newJob.counterHired=0;
             newJob.counterCandidates=0;
 
-        InterfaceHUB hub = InterfaceHUB(interfaceHUB);
-        hub.AddCompanyJob(msg.sender, counterJobs);
+        hub.AddCompanyJob(_owner, counterJobs);
 
         counterJobs++;
 
-        emit ev_CreateJob(msg.sender, msg.value);
+        emit ev_CreateJob(_owner, msg.value);
     }
 
-    function CheckWorkerApplied(uint _nrJob) onlyJobExist(_nrJob) onlyWorker public view returns(bool) {
+    function CheckWorkerApplied(uint _nrJob) onlyJobExist(_nrJob) public view returns(bool) {
         Job storage job = jobs[_nrJob];
+        InterfaceHUB hub = InterfaceHUB(interfaceHUB);
+        require(hub.CheckWorker(msg.sender) || msg.sender == requestContract,"You're not allowed");
         return(job.candidates[ job.candidatesUINT[msg.sender] ].wallet==msg.sender);
     }
 
@@ -166,7 +167,7 @@ contract JobContract is ReentrancyGuard {
         return (job.candidates[ job.candidatesUINT[msg.sender] ].hired);
     }
 
-    function ApplyToJob(address worker, uint _nrJob, string memory _name, string memory _surname, string memory _mobilePhone, uint _age, string memory _CV, string memory _coverLetter) onlyJobExist(_nrJob) onlyWorker external {
+    function ApplyToJob(address worker, uint _nrJob, string memory _name, string memory _surname, string memory _mobilePhone, uint _age, string memory _CV, string memory _coverLetter) onlyJobExist(_nrJob) external {
         Job storage job = jobs[_nrJob];
         require(!CheckWorkerApplied(_nrJob),"Already Registered!");
         require(worker == msg.sender || msg.sender == requestContract,"You're not allowed");
@@ -228,7 +229,7 @@ contract JobContract is ReentrancyGuard {
         return(job.owner, job.total, job.title, job.description, job.workingAddress, job.searchingPosition, job.peopleToHire, job.dateFrom, job.dateTo, job.searching, job.counterCandidates); 
     }
 
-    function ShowHired (uint _nrJob) onlyJobExist(_nrJob) external view returns(uint){
+    function ShowHiredCounter (uint _nrJob) onlyJobExist(_nrJob) external view returns(uint){
         return(jobs[_nrJob].counterHired);
     }
 

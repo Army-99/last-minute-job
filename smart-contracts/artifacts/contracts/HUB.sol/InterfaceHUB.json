@@ -256,13 +256,7 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "sender",
-          "type": "address"
-        }
-      ],
+      "inputs": [],
       "name": "ShowCompanyCounterRequests",
       "outputs": [
         {
@@ -294,6 +288,32 @@
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "ShowContractJobAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "ShowContractRequestAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "address",
@@ -319,11 +339,6 @@
     },
     {
       "inputs": [
-        {
-          "internalType": "address",
-          "name": "sender",
-          "type": "address"
-        },
         {
           "internalType": "uint256",
           "name": "_nrJobApplied",
@@ -409,14 +424,21 @@
       "type": "function"
     },
     {
-      "inputs": [
+      "inputs": [],
+      "name": "ShowWorkerAppliedJobsCounter",
+      "outputs": [
         {
-          "internalType": "address",
-          "name": "sender",
-          "type": "address"
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
         }
       ],
-      "name": "ShowWorkerAppliedJobsCounter",
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "ShowWorkerCounterRequests",
       "outputs": [
         {
           "internalType": "uint256",
@@ -431,16 +453,41 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "sender",
+          "name": "_address",
           "type": "address"
         }
       ],
-      "name": "ShowWorkerCounterRequests",
+      "name": "ShowWorkerHuman",
       "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
         {
           "internalType": "uint256",
           "name": "",
           "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
         }
       ],
       "stateMutability": "view",

@@ -6,6 +6,24 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./HUB.sol";
 import "./JobContract.sol";
 
+interface InterfaceRequest {
+    struct Message{
+        address owner;
+        address destination;
+        string message;
+        uint datetime;
+    }
+    function CreateRequest(address _destination,string memory _title,string memory _description, string memory _workingAddress,uint _hourInit,uint _hourFinish, uint _dateFrom, uint _dateTo, string memory _message) external payable;
+    function SendMessage(uint _nrRequest, string memory _message) external;
+    function ShowMessages(uint _nrRequest) external view returns(Message [] memory);
+    function SetAnswer(uint _nrRequest, uint8 _status) external;
+    function CloseRequest(uint _nrRequest)  external;
+    function ShowCounterRequests() external view returns(uint);
+    function ShowRequest(uint _nrRequest) external view returns(address, address, uint, uint,uint,uint,uint, uint8, bool);
+    function ShowRequestStatus(uint _nrRequest) external view returns(uint8, bool);
+}
+
+
 contract RequestContract is ReentrancyGuard {
 
     constructor (address _interfaceHUB, address _interfaceJOB) {
@@ -126,8 +144,8 @@ contract RequestContract is ReentrancyGuard {
 
     function CloseRequest(uint _nrRequest) requestExist(_nrRequest) nonReentrant external {
         address payable owner = requests[_nrRequest].owner;
-        require(requests[_nrRequest].isActive);
-        require(owner == msg.sender);
+        require(requests[_nrRequest].isActive,"Not active");
+        require(owner == msg.sender, "Not owner");
 
         uint status = requests[_nrRequest].status; 
         address dest = requests[_nrRequest].destination;
@@ -138,14 +156,13 @@ contract RequestContract is ReentrancyGuard {
             InterfaceHUB hub = InterfaceHUB(interfaceHUB);
             
             CreateTheJob(_nrRequest, msg.sender);
-            //job.CreateJob{value:val}(payable(msg.sender),tit,desc,wAdd,sPos,hInit,hFinish,1,dFrom,dTo);
+
             //FETCH THE NEW JOB
             uint nrJob = hub.ShowJobIDCompany(msg.sender, hub.ShowCompanyJobsCounter(msg.sender)-1);
             //AUTO APPLY Worker TO JOB 
 
             bytes memory data = hub.ShowWorker( dest );
-            (string memory name,string memory surname,uint age,string memory mobilePhone,string memory CV,string memory coverLetter) = abi.decode(data, (string, string, uint, string, string, string));
-             
+            (string memory name,string memory surname,uint age,string memory mobilePhone,string memory CV,string memory coverLetter) = abi.decode(data, (string, string, uint, string, string, string)); 
             job.ApplyToJob(dest, nrJob, name, surname, mobilePhone, age, CV, coverLetter);
 
             //AUTO REQUEST HIRE THE Worker IN 0 POSITION (IS THE FIRST AND LAST CANDIDATE)
@@ -174,10 +191,16 @@ contract RequestContract is ReentrancyGuard {
         return(counterRequests);
     }
 
-    function ShowRequest(uint _nrRequest) requestExist(_nrRequest) external view returns(address, address, uint, uint,uint,uint,uint, uint8, bool) {
+    function ShowRequest(uint _nrRequest) requestExist(_nrRequest) external view returns(address, address,string memory, string memory, string memory, uint, uint,uint,uint,uint) {
         Request storage request = requests[_nrRequest];
         require(request.owner == msg.sender || request.destination==msg.sender, "You're not allowed to read the request");
-        return(request.owner, request.destination, request.dateFrom, request.dateTo,request.value,request.hourInit,request.hourFinish, request.status, request.isActive);
+        return(request.owner, request.destination, request.title, request.description, request.workingAddress, request.hourInit,request.hourFinish,request.dateFrom, request.dateTo,request.value);
+    }
+
+    function ShowRequestStatus(uint _nrRequest) requestExist(_nrRequest) external view returns(uint8, bool) {
+        Request storage request = requests[_nrRequest];
+        require(request.owner == msg.sender || request.destination==msg.sender, "You're not allowed to read the request");
+        return(request.status, request.isActive);
     }
 
     function DeactivateRequest(uint _nrRequest) requestExist(_nrRequest) internal {

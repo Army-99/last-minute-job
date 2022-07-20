@@ -77,7 +77,7 @@
           "type": "uint256"
         }
       ],
-      "name": "CheckPersonApplied",
+      "name": "CheckWorkerApplied",
       "outputs": [
         {
           "internalType": "bool",
@@ -96,7 +96,7 @@
           "type": "uint256"
         }
       ],
-      "name": "CheckPersonHired",
+      "name": "CheckWorkerHired",
       "outputs": [
         {
           "internalType": "bool",
@@ -283,7 +283,7 @@
           "type": "uint256"
         }
       ],
-      "name": "ShowHired",
+      "name": "ShowHiredCounter",
       "outputs": [
         {
           "internalType": "uint256",

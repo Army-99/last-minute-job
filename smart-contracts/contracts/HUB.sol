@@ -6,7 +6,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 interface InterfaceHUB {
     function SetContractJobAddress(address _contractJOB) external;
+    function ShowContractJobAddress() external view returns(address);
     function SetContractRequestAddress(address _contractREQUEST) external;
+    function ShowContractRequestAddress() external view returns(address);
     function CreateCompany(string memory _name, string memory _description, string memory _address) external;
     function CreateWorker(string memory _name,string memory _surname,uint _age,string memory _mobilePhone, string memory _CV, string memory _coverLetter) external;
     function CheckCompany(address sender) external view returns(bool);
@@ -14,14 +16,15 @@ interface InterfaceHUB {
     function GetCompaniesCounter() external view returns (uint);
     function GetWorkersCounter() external view returns (uint);
     function ShowWorker(address _address) external view returns(bytes memory);
+    function ShowWorkerHuman(address _address) external view returns(string memory, string memory, uint, string memory, string memory,string memory);
     function ShowWorkerID(uint _nrWorker) external view returns(address);
     function ShowCompany(uint _nrCompany) external view returns(string memory, string memory, string memory);
     function ShowCompanyJobsCounter(address sender) external view returns(uint);
-    function ShowWorkerAppliedJobsCounter(address sender) external view returns(uint);
-    function ShowCompanyCounterRequests(address sender) external view returns(uint); 
-    function ShowWorkerCounterRequests(address sender) external view returns(uint);
+    function ShowWorkerAppliedJobsCounter() external view returns(uint);
+    function ShowCompanyCounterRequests() external view returns(uint); 
+    function ShowWorkerCounterRequests() external view returns(uint);
     function ShowJobIDCompany(address sender, uint _nrJobCreated) external view returns(uint);
-    function ShowJobIDWorker(address sender, uint _nrJobApplied) external view returns(uint);
+    function ShowJobIDWorker(uint _nrJobApplied) external view returns(uint);
     function ShowRequestIDCompany(address sender, uint _nrCompanyRequest) external view returns(uint);
     function ShowRequestIDWorker(address sender, uint _nrPersonRequest) external view returns(uint);
     function AddCompanyJob(address sender, uint _jobID) external;
@@ -32,6 +35,7 @@ interface InterfaceHUB {
 
 contract HUB is Ownable{
     struct Company{
+        address wallet;
         bool registered;
         string name;
         string description;
@@ -43,13 +47,14 @@ contract HUB is Ownable{
     }
 
     struct Worker{
+        address wallet;
         bool registered;
-        bytes name;
-        bytes surname;
-        bytes age;
-        bytes mobilePhone;
-        bytes CV;
-        bytes coverLetter;
+        string name;
+        string surname;
+        uint age;
+        string mobilePhone;
+        string CV;
+        string coverLetter;
         mapping(uint => uint) appliedJob;
         uint counterAppliedJob;
         mapping(uint => uint) incomingRequests;
@@ -85,14 +90,23 @@ contract HUB is Ownable{
         contractJOB=_contractJOB;
     }
 
+    function ShowContractJobAddress() external view returns(address){
+        return(contractJOB);
+    }
+
     function SetContractRequestAddress(address _contractREQUEST) external onlyOwner{
         contractREQUEST=_contractREQUEST;
     }
 
-    function CreateCompany(string memory _name, string memory _description, string memory _address) external{
-        require(!companies[msg.sender].registered,"You're already registerd!");
-        Company storage newCompany = companies[msg.sender];
+    function ShowContractRequestAddress() external view returns(address){
+        return(contractREQUEST);
+    }
 
+    function CreateCompany(string memory _name, string memory _description, string memory _address) external{
+        require(!companies[msg.sender].registered && companies[msg.sender].wallet != msg.sender,"You're already registerd!");
+
+        Company storage newCompany = companies[msg.sender];
+        newCompany.wallet=msg.sender;
         newCompany.registered=true;
         newCompany.name=_name;
         newCompany.description=_description;
@@ -105,23 +119,25 @@ contract HUB is Ownable{
     }
 
     function CreateWorker(string memory _name,string memory _surname,uint _age,string memory _mobilePhone, string memory _CV, string memory _coverLetter) external{
-        require(!workers[msg.sender].registered,"You're already registerd!");
+        require(!workers[msg.sender].registered && workers[msg.sender].wallet != msg.sender,"You're already registerd!");
         //Converted in Bytes32 to pass parameters to CloseRequest in RequestContract
+        /*
         bytes memory name = abi.encode(_name);
         bytes memory surname = abi.encode(_surname);
         bytes memory age = abi.encode(_age);
         bytes memory mobilePhone = abi.encode(_mobilePhone);
         bytes memory CV = abi.encode(_CV);
         bytes memory coverLetter = abi.encode(_coverLetter);
-
+        */
         Worker storage newPerson = workers[msg.sender];
+        newPerson.wallet=msg.sender;
         newPerson.registered=true;
-        newPerson.name=name;
-        newPerson.surname=surname;
-        newPerson.age=age;
-        newPerson.mobilePhone=mobilePhone;
-        newPerson.CV=CV;
-        newPerson.coverLetter=coverLetter;
+        newPerson.name=_name;
+        newPerson.surname=_surname;
+        newPerson.age=_age;
+        newPerson.mobilePhone=_mobilePhone;
+        newPerson.CV=_CV;
+        newPerson.coverLetter=_coverLetter;
 
         workersAddress[counterworkers]=msg.sender;
         counterworkers++;
@@ -130,12 +146,12 @@ contract HUB is Ownable{
     }
 
     function CheckCompany(address sender) external view returns(bool){
-        return(companies[sender].registered);
+        return(companies[sender].registered && companies[sender].wallet==sender);
     }
 
     function CheckWorker(address sender) external view returns(bool){
 
-        return(workers[sender].registered);
+        return(workers[sender].registered && workers[sender].wallet == sender);
     }
 
     function GetCompaniesCounter() external view returns (uint){
@@ -149,6 +165,11 @@ contract HUB is Ownable{
     function ShowWorker(address _address) external view returns(bytes memory) {
         Worker storage person = workers[_address];
         return (abi.encode(person.name, person.surname, person.age, person.mobilePhone, person.CV, person.coverLetter));
+    }
+
+    function ShowWorkerHuman(address _address) external view returns(string memory, string memory, uint, string memory, string memory,string memory) {
+        Worker storage person = workers[_address];
+        return (person.name, person.surname, person.age, person.mobilePhone, person.CV, person.coverLetter);
     }
 
     function ShowWorkerID(uint _nrWorker) external view returns(address) {
@@ -165,16 +186,16 @@ contract HUB is Ownable{
         return (company.counterJobs);
     }
 
-    function ShowWorkerAppliedJobsCounter(address sender) external view returns(uint){
-        return(workers[sender].counterAppliedJob);
+    function ShowWorkerAppliedJobsCounter() external view returns(uint){
+        return(workers[msg.sender].counterAppliedJob);
     }
 
-    function ShowCompanyCounterRequests(address sender) external view returns(uint) {
-        return(companies[sender].counterSendedRequests);
+    function ShowCompanyCounterRequests() external view returns(uint) {
+        return(companies[msg.sender].counterSendedRequests);
     }
 
-    function ShowWorkerCounterRequests(address sender) external view returns(uint) {
-        return(workers[sender].counterIncomingRequests);
+    function ShowWorkerCounterRequests() external view returns(uint) {
+        return(workers[msg.sender].counterIncomingRequests);
     }
 
     function ShowJobIDCompany(address sender, uint _nrJobCreated) external view returns(uint) {
@@ -182,9 +203,10 @@ contract HUB is Ownable{
         return (companies[sender].jobs[_nrJobCreated]);
     }
 
-    function ShowJobIDWorker(address sender, uint _nrJobApplied) external view returns(uint) {
-        require( _nrJobApplied < workers[sender].counterAppliedJob ,"Job not found");
-        return (workers[sender].appliedJob[_nrJobApplied]);
+    function ShowJobIDWorker(uint _nrJobApplied) external view returns(uint) {
+        require( _nrJobApplied < workers[msg.sender].counterAppliedJob ,"Job not found");
+        require ( msg.sender == workers[msg.sender].wallet );
+        return (workers[msg.sender].appliedJob[_nrJobApplied]);
     }
 
     function ShowRequestIDCompany(address sender, uint _nrCompanyRequest) external view returns(uint) {
