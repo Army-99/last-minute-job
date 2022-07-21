@@ -82,6 +82,9 @@ describe("LastMinuteJob -- Contract Tests", function () {
 
     //Show up all the candidates of the job
     expect(await JobContract.connect(company).ShowJobCandidatesCounter(0)).to.equal(1);
+
+
+    console.log(await JobContract.connect(company).ShowJobSummary(0));
     //Show job candidate
     //console.log(await JobContract.connect(company).ShowJobCandidate(0,0))
     //Assuming the company want make a proposal for hiring
@@ -106,11 +109,11 @@ describe("LastMinuteJob -- Contract Tests", function () {
     let AfterPayPerson = await provider.getBalance(person.address);
     let AfterPayCompany = await provider.getBalance(company.address);
 
-    console.log("Comapny before: " + BerforePayCompany);
-    console.log("Company After: " + AfterPayCompany);
+    //console.log("Comapny before: " + BerforePayCompany);
+    //console.log("Company After: " + AfterPayCompany);
 
-    console.log("Person before " + BerforePayPerson);
-    console.log("Person after: " + AfterPayPerson);
+    //console.log("Person before " + BerforePayPerson);
+    //console.log("Person after: " + AfterPayPerson);
 
     //console.log(await JobContract.connect(person).ShowJobSummary(0));
 
@@ -133,21 +136,25 @@ describe("LastMinuteJob -- Contract Tests", function () {
     await RequestContract.connect(person).SetAnswer(0,2);
 
     await RequestContract.connect(company).CloseRequest(0);
-    //expect(await HUBContract.connect(company).ShowCompanyJobsCounter(company.address)).to.equal(1);
+
+    expect(await JobContract.connect(company).ShowJobCandidatesCounter(0)).to.equal(1);
+
+    console.log(await JobContract.connect(company).ShowJobCandidate(0, 0));
 
     //console.log(await RequestContract.connect(company).ShowRequestStatus(0));
 
-    /*
-    expect(await HUBContract.connect(person).appliedJobsCounter()).to.equal(1);
+    
+    expect(await HUBContract.connect(person).ShowWorkerAppliedJobsCounter()).to.equal(1);
 
-    expect(await HUBContract.connect(company).ShowJobsCounter()).to.equal(1);
+    expect(await JobContract.connect(company).ShowJobsCounter()).to.equal(1);
 
+    
     //console.log(await lastMinuteContract.connect(company).ShowJobSummary(0));
 
     let BerforPayCompany = await provider.getBalance(company.address);
     let BerforPayPerson = await provider.getBalance(person.address);
 
-    await RequestContract.connect(company).CloseAndPay(0);
+    await JobContract.connect(company).CloseAndPay(0);
 
     let AfterPayPerson = await provider.getBalance(person.address);
     let AfterPayCompany = await provider.getBalance(company.address);
@@ -156,10 +163,10 @@ describe("LastMinuteJob -- Contract Tests", function () {
     //console.log("Company After: " + AfterPayCompany);
     //console.log("Person before " + BerforPayPerson);
     //console.log("Person after: " + AfterPayPerson);
-    */
+    
   });
 
-  /* OLD TESTS 
+  /* OLD TESTS */ 
   it("OLD Create a job and finish the cycle with full payment to one person", async function () {
       //Create a job
       await lastMinuteContract.connect(company).CreateJob("Titolo", "Descrizione", "Working Address", "Chef", 840, 1320,1, 1656288000, 1656460800, { value: ethers.utils.parseEther("1") });
@@ -253,7 +260,7 @@ describe("LastMinuteJob -- Contract Tests", function () {
     //console.log("Person before " + BerforPayPerson);
     //console.log("Person after: " + AfterPayPerson);
   });
-  */
+  
 });
 
 
