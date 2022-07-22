@@ -340,7 +340,7 @@ const useHub = () => {
         return tx;
     };
 
-    const ShowCompanyCounterRequests = async(address) => {
+    const ShowCompanyCounterRequests = async() => {
         setIsLoadingHub(true);
         setErrorHub(false);
         let tx;
@@ -350,7 +350,7 @@ const useHub = () => {
         abi: hubAbi,
         };
         try{
-            tx = await Moralis.executeFunction(options);
+            tx = HexToDec(await Moralis.executeFunction(options));
         }catch(err){
             console.error(err)
             setErrorHub(err);
@@ -359,7 +359,7 @@ const useHub = () => {
         return tx;
     };
 
-    const ShowWorkerCounterRequests = async(address) => {
+    const ShowWorkerCounterRequests = async() => {
         setIsLoadingHub(true);
         setErrorHub(false);
         let tx;
@@ -369,7 +369,7 @@ const useHub = () => {
         abi: hubAbi,
         };
         try{
-            tx = await Moralis.executeFunction(options);
+            tx = HexToDec(await Moralis.executeFunction(options));
         }catch(err){
             console.error(err)
             setErrorHub(err);

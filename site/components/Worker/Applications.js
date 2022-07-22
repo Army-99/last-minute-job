@@ -4,7 +4,6 @@ import ShowJobs from "../ShowJobs";
 import useJob from "../../hooks/useJob";
 import useHub from "../../hooks/useHub";
 
-
 const Applications = () => {
     const { FetchPersonPublicJob, CheckIfHireQuestion, CheckIfHired } = useJob();
     const { isLoadingJob, FetchJob, AcceptJob , CheckJobClose } = useJob();

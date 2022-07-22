@@ -1,4 +1,4 @@
-import { requestAddress, requestAbi } from "../Contract/datas";
+import { requestAddress, requestAbi } from "../Contracts/datas";
 import { useMoralis } from "react-moralis";
 import { useEffect, useState } from "react";
 import HexToDec from "../helpers/formatters";

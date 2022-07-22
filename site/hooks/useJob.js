@@ -185,7 +185,7 @@ const useJob = () => {
         abi: jobAbi,
         };
         try{
-            tx = await Moralis.executeFunction(options);
+            tx = HexToDec(await Moralis.executeFunction(options));
         }catch(err){
             console.error(err)
             setErrorJob(err);

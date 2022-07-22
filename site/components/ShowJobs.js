@@ -19,7 +19,7 @@ const ShowJobs = ({jobs, applied, acceptJob, Loading}) => {
 
     
     useEffect( () => {
-        if(jobs.length = 0){
+        if(jobs.length == 0){
             setShow0(true);
         }else{
             setShow0(false);
@@ -62,7 +62,7 @@ const ShowJobs = ({jobs, applied, acceptJob, Loading}) => {
         {
         isAuthenticated &&
         <>
-            {show0 ?
+            {!show0 ?
             <div className="sm:grid md:grid-cols-2 lg:grid-cols-3 sm:w-full">
                 {
                     jobs.map( (item,k) => {
@@ -124,9 +124,10 @@ const ShowJobs = ({jobs, applied, acceptJob, Loading}) => {
                     }
             </div>
             :
-            <div>
-                <p className="text-white">You have not applications</p>
-            </div>}
+            <div className="flex w-screen h-screen justify-center items-center">
+                <p className="text-white">There are no jobs</p>
+            </div>
+            }
         </>   
     }
     </>

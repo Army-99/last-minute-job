@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
-import { useMoralis } from "react-moralis";
 import {HexToDec} from "../../helpers/formatters";
+import useHub from "../../hooks/useHub";
 import useRequest from "../../hooks/useRequest";
 import ShowRequests from "../ShowRequests";
 import Loader from "../UI/Loader";
 
 const IncomingRequest = () => {
     const { ShowCounterRequestsPerson, ShowIDRequestPerson, FetchRequest, isLoadingRequest } = useRequest();
+    const { ShowWorkerCounterRequests, isLoadingHub } = useHub();
     const [ requests, setRequests] = useState([]);
     const [counterRequest, setCounterRequest] = useState(null);
     const [nrRequest, setNrRequest] = useState();
@@ -22,21 +23,12 @@ const IncomingRequest = () => {
 
     //Fetch the Request counter of person
     useEffect(() => {
-        const Fetch = async() => {
-            setCounterRequest(HexToDec(await ShowCounterRequestsPerson()));
-        }
-        if(isLoadingRequest==false)
-            Fetch();
-    },[isLoadingRequest])
+        FetchWorkerCounterRequest();
+    },[])
 
     //Fetch the requests when the counter is valorize
     useEffect(() => {
-        const FetchRequests = async() => {
-                for(let k=0; k<counterRequest; k++){
-                    let nrRequest = (await ShowIDRequestPerson(k));
-                    addRequest(await FetchRequest(nrRequest),HexToDec(nrRequest));
-                }
-        }
+        
         FetchRequests();
     },[counterRequest])
 
@@ -47,13 +39,26 @@ const IncomingRequest = () => {
         }
     },[requests])
 
+    const FetchWorkerCounterRequest = async() => {
+        setCounterRequest(await ShowWorkerCounterRequests());
+    }
+
+    const FetchRequests = async() => {
+        for(let k=0; k<counterRequest; k++){
+            let nrRequest = (await ShowIDRequestPerson(k));
+            addRequest(await FetchRequest(nrRequest),HexToDec(nrRequest));
+        }
+    }
+
     return(
         <>
-        {show ? <ShowRequests requests={requests}></ShowRequests> 
-        : 
+        {isLoadingHub ? 
         <div className="flex w-screen h-screen justify-center items-center">
             <Loader></Loader>
-        </div>}
+        </div> 
+        : 
+        <ShowRequests requests={requests}></ShowRequests>
+        }
         </>
     )
 }
