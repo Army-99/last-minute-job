@@ -2,18 +2,22 @@ import { useRouter } from "next/router";
 import { useEffect } from "react"
 import { useMoralis } from "react-moralis";
 import SendedRequest from "../../components/Company/SendedRequest";
-import useCompany from "../../hooks/useCompany";
+import useCredentials from "../../hooks/useCredentials";
 
 const SendedRequests = () => {
     const { isAuthenticated } = useMoralis();
-    const { isCompany } = useCompany();
+    const { isCompany } = useCredentials();
     const router = useRouter();
 
     useEffect(() => {
-        if(!isAuthenticated && isAuthenticated!=null)
+        if(!isAuthenticated){
             router.replace("/");
-        if(isCompany!=null  && !isCompany)
-            router.replace("/dashboard");
+        }
+        else{
+            if(isCompany!=null && !isCompany){
+                router.replace("/dashboard");
+            }
+        }
     },[isCompany, isAuthenticated])
 
     return(

@@ -1,12 +1,11 @@
 import { useRef, useState } from "react";
 import { useMoralis } from "react-moralis";
-import { contractABI, ContractAddress } from "../../Contract/datas";
 import { useRouter } from 'next/router';
+import useHub from "../../hooks/useHub";
+import Loader from "../UI/Loader";
 
 const RegisterPerson = ({MainHandler, Close}) => {
-    const [isLoading, setIsLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState();
-    const { Moralis } = useMoralis();
+    const { isLoadingHub, errorHub, CreateWorker } = useHub();
     const router = useRouter();
 
     const name = useRef();
@@ -27,34 +26,7 @@ const RegisterPerson = ({MainHandler, Close}) => {
     const coverl = useRef();
     const coverlError = useRef();
 
-    const RegisterPerson = async() => {
-        setIsLoading(true);
-        setErrorMessage();
-        let options = {
-            contractAddress: ContractAddress,
-            functionName: "RegisterAsPerson",
-            abi: contractABI,
-            params: {
-            _name: name.current.value,
-            _surname: surname.current.value,
-            _age: age.current.value,
-            _mobilePhone: mobile.current.value,
-            _CV: cv.current.value,
-            _coverLetter: coverl.current.value
-            },
-        };
-        try{
-          const tx = await Moralis.executeFunction(options);
-          await tx.wait();
-          router.reload(window.location.pathname);
-        }catch(err){
-            console.log(err.message);
-            setErrorMessage(err);
-        }
-        setIsLoading(false);
-    }
-
-    const Handler = (e) => {
+    const Handler = async (e) => {
         let error=false;
         e.preventDefault();
         if(!name.current.value){
@@ -89,8 +61,22 @@ const RegisterPerson = ({MainHandler, Close}) => {
           coverlError.current.className = "text-red-500 text-xs italic";
         }else coverlError.current.className = "hidden";
 
-        if(!error){
-            RegisterPerson();
+        if(!error)
+        {
+          let nameParam = name.current.value;
+          let surnameParam = surname.current.value;
+          let ageParam = age.current.value;
+          let mobilePhoneParam = mobile.current.value;
+          let CVParam = cv.current.value;
+          let coverLetterParam = coverl.current.value;
+
+          const tx = await CreateWorker(nameParam, surnameParam, ageParam, mobilePhoneParam, CVParam, coverLetterParam);
+          
+          if(tx)
+          {
+            router.reload(window.location.pathname);
+          }
+            
         }
     }
 
@@ -156,12 +142,12 @@ const RegisterPerson = ({MainHandler, Close}) => {
 
             <div className="flex justify-center mb-5">
                 <div>
-                {!isLoading ? <button type="submit" className=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Submit</button> : <div className="text-white">LOADING</div>}
+                {isLoadingHub ?  <Loader /> : <button type="submit" className=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Submit</button>}
                 </div>
             </div>
 
             <div className="flex justify-center w-full">
-                {!!errorMessage && <p className="text-red-500 text-xs italic w-full">{errorMessage.message}</p>}
+                {errorHub ? <p className="text-red-500 text-xs italic w-full">{errorHub.message}</p> : <></>}
             </div>
             
             

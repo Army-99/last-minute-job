@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useMoralis } from "react-moralis";
-import { jobAddress, jobAbi } from "../Contract/datas";
+import { jobAddress, jobAbi } from "../Contracts/datas";
 import { HexToDec } from "../helpers/formatters";
 
 const useJob = () => {
-    const  { Moralis } = useMoralis();
+    const { Moralis } = useMoralis();
     const [ isLoadingJob, setIsLoadingJob ] = useState(false);
     const [ errorJob, setErrorJob ] = useState(false);
 

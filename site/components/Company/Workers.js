@@ -2,18 +2,17 @@ import { useEffect, useState } from "react";
 import { ContractAddress, contractABI} from '../../Contract/datas';
 import { useMoralis } from "react-moralis";
 import {HexToDec} from '../../helpers/formatters'
-import usePerson from "../../hooks/usePerson";
 import Button from "../UI/Button";
-import useCompany from "../../hooks/useCompany";
 import ModalCreateRequest from "./ModalCreateRequest";
 import Loader from "../UI/Loader";
+import useJob from "../../hooks/useJob";
 
 const Workers = () => {
     const [counterWorkers, setCounterWorkers] = useState();
     const [workers, setWorkers] = useState([]);
     const [error, setError] = useState();
     const { Moralis } = useMoralis();
-    const { FetchWorker } = usePerson();
+    const { FetchWorker } = useJob();
     const [ showModal, setShowModal] = useState(false);
     const [ addressWorker, setAddressWorker ] = useState();
     const [ show, setShow ] = useState(false);

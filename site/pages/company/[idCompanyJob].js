@@ -1,16 +1,16 @@
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react"
 import { MoralisProvider, useMoralis } from "react-moralis";
-import useCompany from "../../hooks/useCompany";
 import { ContractAddress, contractABI} from "../../Contract/datas";
 import useJob from "../../hooks/useJob";
-import HexToDec from "../../helpers/formatters";
 import Candidate from "../../components/Company/Candidate";
 import Button from "../../components/UI/Button";
+import useCredentials from "../../hooks/useCredentials";
 
 const ManageJob = () => {
     const { isAuthenticated, Moralis } = useMoralis();
-    const { isCompany, FetchCompanyPublicJob, HireQuestion, isLoadingCompany } = useCompany();
+    const { isCompany } = useCredentials();
+    const { FetchCompanyPublicJob, HireQuestion, isLoadingJob } = useJob();
     const { FetchJob, ShowJobCandidatesCounter, ShowJobCandidate, CheckJobClose, SetAbsentHours } = useJob();
 
     const [isLoading, setIsLoading] = useState(false);
@@ -30,10 +30,15 @@ const ManageJob = () => {
 
     //Check if is auth, is company and is the owner
     useEffect(() => {
-        if(!isAuthenticated)
-            if (!isAuthenticated) router.replace("/");
-        if(isCompany!==null  && !isCompany)
-            if (!isCompany) router.replace("/dashboard");
+        if(!isAuthenticated){
+            router.replace("/");
+        }
+        else{
+            if(isCompany!=null && !isCompany){
+                router.replace("/dashboard");
+            }
+        }
+        
         if(owner && isAuthenticated) {
             if(owner.toUpperCase() !== Moralis.account.toUpperCase())
                 router.replace("/dashboard");
@@ -88,7 +93,7 @@ const ManageJob = () => {
         }
         Fetch();
         //console.log(candidates)
-    },[counterCandidates,isLoadingCompany])
+    },[counterCandidates,isLoadingJob])
 
     //For manage the state with array
     const addCandidate = (data) => {
@@ -184,7 +189,7 @@ const ManageJob = () => {
             {
                 candidates.map((item,i) => { 
                     return(
-                       <Candidate item={item} jobClose={jobClose} isLoadingCompany={isLoadingCompany} proposeHire={e => HandleHireQuestion(e,i)} SetAbsentHours={ e => HandleSetAbsentHour(e,i)} refHoursAbsent={refHoursAbsent}></Candidate>
+                       <Candidate item={item} jobClose={jobClose} isLoadingJob={isLoadingJob} proposeHire={e => HandleHireQuestion(e,i)} SetAbsentHours={ e => HandleSetAbsentHour(e,i)} refHoursAbsent={refHoursAbsent}></Candidate>
                     )})
             }
             <div className="flex justify-center h-10">

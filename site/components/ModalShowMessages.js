@@ -1,7 +1,6 @@
 
 import Button from "./UI/Button";
 import { useState, useRef } from "react";
-import { useMoralis } from "react-moralis";
 import {HexToDec} from "../helpers/formatters";
 import useRequest from "../hooks/useRequest";
 import Input from "./UI/Input"
@@ -10,7 +9,7 @@ import Input from "./UI/Input"
 
 const ModalShowMessages = ({messages, close, nrRequest, active}) => {
     const [error, setError] = useState(false);
-    const { SendMessage, isLoadingRequest, is } = useRequest();
+    const { SendMessage, isLoadingRequest } = useRequest();
     const messageRef = useRef();
 
     const HandlerSendMessage = async(e) => {

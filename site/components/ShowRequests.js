@@ -1,16 +1,14 @@
 import { useMoralis } from "react-moralis";
 import { getEllipsisTxt, HexToDec } from "../helpers/formatters";
-import usePerson from '../hooks/usePerson';
-import useCompany from '../hooks/useCompany';
 import Button from './UI/Button';
 import { useEffect, useState } from "react";
 import ModalShowMessages from "./ModalShowMessages";
 import useRequest from "../hooks/useRequest";
+import useCredentials from "../hooks/useCredentials";
 
 const ShowRequests = ({requests}) => {
     const { Moralis } = useMoralis();
-    const { isPerson } = usePerson();
-    const { isCompany } = useCompany();
+    const { isCompany, isWorker } = useCredentials();
     const { CloseRequest, isLoadingRequest, ShowMessages, SetAnswer } = useRequest();
     const [ showModal, setShowModal] = useState(false);
     const [ messages, setMessages ] = useState([]);
@@ -90,7 +88,7 @@ const ShowRequests = ({requests}) => {
                             <div className="bg-gray-200 text-gray-700 text-lg px-6 py-4">
                                 {isActive && <p>Request is Open</p>}
                                 {isCompany && <p className="font-bold">Worker: {getEllipsisTxt(destination)} {/*destination*/}</p>}
-                                {isPerson && <p className="font-bold">Compnay: {getEllipsisTxt(owner)} {/*destination*/}</p>}
+                                {isWorker && <p className="font-bold">Compnay: {getEllipsisTxt(owner)} {/*destination*/}</p>}
                                 <div className="flex justify-between">
                                     <p>{dateFrom.getDate() + '/' + dateFrom.getMonth() + '/' +dateFrom.getFullYear()} - {dateTo.getDate() + '/' + dateTo.getMonth() + '/' +dateTo.getFullYear()}</p>
                                 </div>
@@ -103,7 +101,7 @@ const ShowRequests = ({requests}) => {
                             <div className="px-6 py-4 border-t border-gray-200 text-black flex justify-between">
                                 {isActive ? <p>{statusString}</p> : <p>Request is Close</p>}
                                 
-                                {isPerson && status==0 && isActive && <><Button Loading={isLoadingRequest} onClick={(e) => HandleSetAnswer(e,nrRequest,2) }>Accept</Button> <Button Loading={isLoadingRequest}  onClick={(e) => HandleSetAnswer(e,nrRequest,1) }>Decline</Button></>}
+                                {isWorker && status==0 && isActive && <><Button Loading={isLoadingRequest} onClick={(e) => HandleSetAnswer(e,nrRequest,2) }>Accept</Button> <Button Loading={isLoadingRequest}  onClick={(e) => HandleSetAnswer(e,nrRequest,1) }>Decline</Button></>}
                                 {isCompany && isActive && <Button Loading={isLoadingRequest} onClick={(e) => HandleCloseRequest(e, nrRequest)}>Close</Button>}
                             </div>
 

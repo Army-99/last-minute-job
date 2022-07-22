@@ -1,13 +1,13 @@
 import { useMoralis } from "react-moralis";
 import Link from 'next/link';
-import useCompany from "../hooks/useCompany";
-import usePerson from "../hooks/usePerson";
 import { getEllipsisTxt } from "../helpers/formatters";
 import { useMoralisWeb3Api, useNativeBalance  } from "react-moralis";
 
 import {
     HomeIcon
 } from "@heroicons/react/outline";
+import useCredentials from "../hooks/useCredentials";
+import { useEffect } from "react";
 
 const LinkStruct = ({name, href, children}) => { 
     return(
@@ -23,12 +23,8 @@ const LinkStruct = ({name, href, children}) => {
 
 const SideBar = ({children}) => {
     const { isAuthenticated, logout, account, chainId } = useMoralis();
+    const { isCompany, isWorker } = useCredentials();
     const { data: balance } = useNativeBalance({ chain : chainId, address: account });
-
-    const { isPerson } = usePerson();
-    const { isCompany } = useCompany();
-    const Web3Api = useMoralisWeb3Api();
-
 
     const HandlerLogOut = async() => {
         await logout();
@@ -45,7 +41,7 @@ const SideBar = ({children}) => {
                     </div>
 
                     <div>
-                        <p className="text-center text-xl">{isPerson && "Persona"} {isCompany && "Company"}</p>
+                        <p className="text-center text-xl">{isWorker && "Worker"} {isCompany && "Company"}</p>
                     </div>
 
                     <div>
@@ -59,15 +55,16 @@ const SideBar = ({children}) => {
                 <div className="flex">
                     <div className="space-y-10">
                         <hr className="border-t-[0.1px] border-gray-900"></hr>
-                        { isCompany ? 
+                        { isCompany && 
                         <>   
                             <LinkStruct name={"Hire"} href={"/company/allWorkers"}></LinkStruct>
                             <LinkStruct name={"Create Job"} href={"/company/createJob"}></LinkStruct>
                             <LinkStruct name={"My Jobs"} href={"/company/myJobs"}></LinkStruct>
                             <LinkStruct name={"My Requests"} href={"/company/sendedRequests"}></LinkStruct>
                         </>
-                        :
-                        isPerson &&
+                        }
+
+                        { isWorker &&
                         <>
                             <LinkStruct name={"Last Applications"} href={"/worker/jobApplications"}></LinkStruct>
                             <LinkStruct name={"Jobs"} href={"/worker/allJobs"}></LinkStruct>

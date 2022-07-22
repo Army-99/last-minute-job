@@ -1,15 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
 import { hubAbi, hubAddress } from "../Contracts/datas";
 import { HexToDec } from "../helpers/formatters";
 
 const useHub = () => {
-    const  { Moralis } = useMoralis();
+    const { Moralis, isAuthenticated, isWeb3Enabled, isWeb3EnableLoading, enableWeb3 } = useMoralis();
     const [ isLoadingHub, setIsLoadingHub ] = useState(false);
-    const [ errorHub, setErrorHub ] = useState(null);
+    const [ errorHub, setErrorHub ] = useState(false);
+    
+
+    useEffect(() => {
+		if (isAuthenticated && !isWeb3Enabled && !isWeb3EnableLoading)
+			enableWeb3();
+	}, [isAuthenticated, isWeb3Enabled]);
 
     const SetContractJobAddress = async(contractJOB) => {
         setIsLoadingHub(true);
+        setErrorHub(false);
         let tx;
         let options = {
         contractAddress: hubAddress,
@@ -32,6 +39,7 @@ const useHub = () => {
 
     const ShowContractJobAddress = async() => {
         setIsLoadingHub(true);
+        setErrorHub(false);
         let tx;
         let options = {
         contractAddress: hubAddress,
@@ -50,6 +58,7 @@ const useHub = () => {
 
     const SetContractRequestAddress = async(contractREQUEST) => {
         setIsLoadingHub(true);
+        setErrorHub(false);
         let tx;
         let options = {
         contractAddress: hubAddress,
@@ -72,6 +81,7 @@ const useHub = () => {
 
     const ShowContractRequestAddress = async() => {
         setIsLoadingHub(true);
+        setErrorHub(false);
         let tx;
         let options = {
         contractAddress: hubAddress,
@@ -90,6 +100,7 @@ const useHub = () => {
 
     const CreateCompany = async(name, description, address) => {
         setIsLoadingHub(true);
+        setErrorHub(false);
         let tx;
         let options = {
         contractAddress: hubAddress,
@@ -114,6 +125,7 @@ const useHub = () => {
 
     const CreateWorker = async(name, surname, age, mobilePhone, CV, coverLetter) => {
         setIsLoadingHub(true);
+        setErrorHub(false);
         let tx;
         let options = {
         contractAddress: hubAddress,
@@ -141,6 +153,7 @@ const useHub = () => {
 
     const CheckCompany = async(address) => {
         setIsLoadingHub(true);
+        setErrorHub(false);
         let tx;
         let options = {
         contractAddress: hubAddress,
@@ -162,6 +175,7 @@ const useHub = () => {
 
     const CheckWorker = async(address) => {
         setIsLoadingHub(true);
+        setErrorHub(false);
         let tx;
         let options = {
         contractAddress: hubAddress,
@@ -183,6 +197,7 @@ const useHub = () => {
 
     const GetCompaniesCounter = async() => {
         setIsLoadingHub(true);
+        setErrorHub(false);
         let tx;
         let options = {
         contractAddress: hubAddress,
@@ -201,6 +216,7 @@ const useHub = () => {
 
     const GetWorkersCounter = async() => {
         setIsLoadingHub(true);
+        setErrorHub(false);
         let tx;
         let options = {
         contractAddress: hubAddress,
@@ -219,6 +235,7 @@ const useHub = () => {
 
     const ShowWorkerHuman = async(address) => {
         setIsLoadingHub(true);
+        setErrorHub(false);
         let tx;
         let options = {
         contractAddress: hubAddress,
@@ -240,6 +257,7 @@ const useHub = () => {
 
     const ShowWorkerID = async(nrWorker) => {
         setIsLoadingHub(true);
+        setErrorHub(false);
         let tx;
         let options = {
         contractAddress: hubAddress,
@@ -261,6 +279,7 @@ const useHub = () => {
 
     const ShowCompany = async(nrCompany) => {
         setIsLoadingHub(true);
+        setErrorHub(false);
         let tx;
         let options = {
         contractAddress: hubAddress,
@@ -282,6 +301,7 @@ const useHub = () => {
 
     const ShowCompanyJobsCounter = async(address) => {
         setIsLoadingHub(true);
+        setErrorHub(false);
         let tx;
         let options = {
         contractAddress: hubAddress,
@@ -303,6 +323,7 @@ const useHub = () => {
 
     const ShowWorkerAppliedJobsCounter = async() => {
         setIsLoadingHub(true);
+        setErrorHub(false);
         let tx;
         let options = {
         contractAddress: hubAddress,
@@ -310,7 +331,7 @@ const useHub = () => {
         abi: hubAbi,
         };
         try{
-            tx = await Moralis.executeFunction(options);
+            tx = HexToDec(await Moralis.executeFunction(options));
         }catch(err){
             console.error(err)
             setErrorHub(err);
@@ -321,6 +342,7 @@ const useHub = () => {
 
     const ShowCompanyCounterRequests = async(address) => {
         setIsLoadingHub(true);
+        setErrorHub(false);
         let tx;
         let options = {
         contractAddress: hubAddress,
@@ -339,6 +361,7 @@ const useHub = () => {
 
     const ShowWorkerCounterRequests = async(address) => {
         setIsLoadingHub(true);
+        setErrorHub(false);
         let tx;
         let options = {
         contractAddress: hubAddress,
@@ -357,6 +380,7 @@ const useHub = () => {
 
     const ShowJobIDCompany = async(address, nrJobCompany) => {
         setIsLoadingHub(true);
+        setErrorHub(false);
         let tx;
         let options = {
         contractAddress: hubAddress,
@@ -379,6 +403,7 @@ const useHub = () => {
 
     const ShowJobIDWorker = async(nrJobApplied) => {
         setIsLoadingHub(true);
+        setErrorHub(false);
         let tx;
         let options = {
         contractAddress: hubAddress,
@@ -400,6 +425,7 @@ const useHub = () => {
 
     const ShowRequestIDCompany = async(address, nrCompanyRequest) => {
         setIsLoadingHub(true);
+        setErrorHub(false);
         let tx;
         let options = {
         contractAddress: hubAddress,
@@ -422,6 +448,7 @@ const useHub = () => {
 
     const ShowRequestIDWorker = async(sender, nrPersonRequest) => {
         setIsLoadingHub(true);
+        setErrorHub(false);
         let tx;
         let options = {
         contractAddress: hubAddress,

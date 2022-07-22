@@ -1,13 +1,13 @@
 import { useRef, useState } from "react";
-import { useMoralis } from "react-moralis";
-import { contractABI, ContractAddress } from "../../Contract/datas";
+import Loader from "../UI/Loader";
 import { useRouter } from 'next/router';
+import useHub from "../../hooks/useHub";
 
 const RegisterCompany = ({MainHandler, Close}) => {
-    const [isLoading, setIsLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState();
+    const { CreateCompany, isLoadingHub, errorHub } = useHub();
+
     const router = useRouter();
-    const { Moralis } = useMoralis();
+
     const name = useRef();
     const nameError = useRef();
     const description= useRef();
@@ -19,33 +19,7 @@ const RegisterCompany = ({MainHandler, Close}) => {
     const zip = useRef();
     const zipError = useRef();
 
-    const RegisterCompany = async() => {
-        setIsLoading(true);
-        setErrorMessage();
-        let options = {
-            contractAddress: ContractAddress,
-            functionName: "RegisterAsCompany",
-            abi: contractABI,
-            params: {
-            _name: name.current.value,
-            _description: description.current.value,
-            _address: city.current.value + "-" + state.current.value + "-" + zip.current.value 
-            },
-        };
-        try{
-            const transaction = await Moralis.executeFunction(options);
-            await transaction.wait(1);
-            router.reload(window.location.pathname);
-        }catch(err){
-            console.log(err.message);
-            setErrorMessage(err);
-            setIsLoading(false);
-        }
-        
-        setIsLoading(false);
-    }
-
-    const Handler = (e) => {
+    const Handler = async(e) => {
         e.preventDefault();
         let error=false;
         if(!name.current.value){
@@ -76,7 +50,14 @@ const RegisterCompany = ({MainHandler, Close}) => {
         }else zipError.current.className = "hidden";
 
         if(!error){
-            RegisterCompany();
+          let nameParam = name.current.value;
+          let descParam = description.current.value;
+          let addParam = city.current.value + "-" + state.current.value + "-" + zip.current.value;
+
+          const tx = await CreateCompany(nameParam, descParam, addParam);
+
+          if(tx)
+            router.reload(window.location.pathname);
         }
     }
 
@@ -132,15 +113,13 @@ const RegisterCompany = ({MainHandler, Close}) => {
 
             <div className="flex justify-center mb-5">
                 <div>
-                {!isLoading ? <button type="submit" className=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Submit</button> : <div className="text-white">LOADING</div>}
+                {isLoadingHub ?  <Loader></Loader> : <button type="submit" className=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Submit</button>}
                 </div>
+            </div>
 
-                
-            </div>
             <div className="flex justify-center">
-                {!!errorMessage && <p className="text-red-500 text-xs italic">{errorMessage.message}</p>}
+                {errorHub ? <p className="text-red-500 text-xs italic">{errorHub.message}</p> : <></>}
             </div>
-            
             
           </form>
     )
