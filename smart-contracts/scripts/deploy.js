@@ -26,7 +26,7 @@ async function main() {
   //JobContract deployed to: 0x5388C0DCbBA944024C321A110c2DE29084583b10
 
   const Request = await hre.ethers.getContractFactory("RequestContract");
-  const request = await Request.deploy(HUBContract.address,JobContract.address);
+  const request = await Request.deploy(hub.address,job.address);
   await request.deployed();
   console.log("RequestContract deployed to:", request.address);
   //RequestContract deployed to: 0x351875F56B61A6c2Cf676CC69251b3b3a779A103
