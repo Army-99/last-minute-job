@@ -1,14 +1,14 @@
 import { requestAddress, requestAbi } from "../Contracts/datas";
 import { useMoralis } from "react-moralis";
 import { useEffect, useState } from "react";
-import HexToDec from "../helpers/formatters";
+import { HexToDec } from "../helpers/formatters";
 
 const useRequest = () => {
     const { Moralis} = useMoralis();
     const [ errorRequest, setErrorRequest ] = useState(null);
     const [ isLoadingRequest, setIsLoadingRequest ] = useState(false);
 
-    const CreateRequest = async(destination, title, description, workingAddress, hourInit, hourFinish, dateFrom, dateTo, message) => {
+    const CreateRequest = async(destination, title, description, workingAddress, hourInit, hourFinish, dateFrom, dateTo, message, value) => {
         setIsLoadingRequest(true);
         let tx;
         let options = {
@@ -25,7 +25,8 @@ const useRequest = () => {
             _dateFrom: dateFrom,
             _dateTo: dateTo,
             _message: message
-        }
+        },
+        msgValue: Moralis.Units.ETH(value)
         };
         try{
             tx = await Moralis.executeFunction(options);

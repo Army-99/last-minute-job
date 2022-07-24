@@ -19,7 +19,7 @@ interface InterfaceRequest {
     function SetAnswer(uint _nrRequest, uint8 _status) external;
     function CloseRequest(uint _nrRequest)  external;
     function ShowCounterRequests() external view returns(uint);
-    function ShowRequest(uint _nrRequest) external view returns(address, address, uint, uint,uint,uint,uint, uint8, bool);
+    function ShowRequest(uint _nrRequest) external view returns(address, address,string memory, string memory, string memory, uint, uint,uint,uint,uint);
     function ShowRequestStatus(uint _nrRequest) external view returns(uint8, bool);
 }
 

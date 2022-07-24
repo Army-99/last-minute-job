@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
 import { HexToDec } from "../../helpers/formatters";
+import useHub from "../../hooks/useHub";
 import useRequest from "../../hooks/useRequest";
 import ShowRequests from "../ShowRequests";
 import Loader from "../UI/Loader";
 
 const SendedRequest = () => {
-    const { FetchCounterRequestCompany, ShowIDRequestCompany, FetchRequest, ShowMessages } = useRequest();
+    const { isLoadingRequest, FetchCounterRequestCompany, ShowIDRequestCompany, ShowRequest, ShowMessages } = useRequest();
+    const { isLoadingHub, ShowCompanyCounterRequests, ShowRequestIDCompany }  = useHub();
+    const { account } = useMoralis();
     const [ requests, setRequests] = useState([]);
     const [counterRequest, setCounterRequest] = useState(null);
-    const [show, setShow] = useState(false);
 
     const addRequest = (data, nrRequest) => {
         setRequests(prevItems => [...prevItems, {
@@ -21,38 +23,45 @@ const SendedRequest = () => {
 
     //Fetch the Request counter of company
     useEffect(() => {
-        const Fetch = async() => {
-            let counter = (await FetchCounterRequestCompany());
-            setCounterRequest(HexToDec(counter));
-        }
-        Fetch();
+        FetchCounterRequests();
     },[])
 
     //Fetch the requests when the counter is valorize
     useEffect(() => {
-        const FetchRequests = async() => {
-            for(let k=0; k<counterRequest; k++){
-                let nrRequest = await ShowIDRequestCompany(k);
-                addRequest(await FetchRequest(nrRequest),HexToDec(nrRequest));
-            }
-        }
         FetchRequests();
     },[counterRequest])
 
-    useEffect(() => {
-        if(requests.length == counterRequest){ 
-            setShow(true);
-         }
+    const FetchCounterRequests = async() => {
+        setCounterRequest(await ShowCompanyCounterRequests());
+    }
 
-    },[requests])
+    const FetchRequests = async() => {
+        for(let k=0; k< counterRequest; k++){
+            let nrRequestPublic = await ShowRequestIDCompany(account, k);
+            //console.log(await ShowRequest(nrRequestPublic))
+            
+            //addRequest(await ShowRequest(nrRequestPublic),nrRequestPublic);
+        }
+    }
 
     return(
         <>
         {
-            show ? <ShowRequests requests={requests} ></ShowRequests>
-            : <div className="flex w-screen h-screen justify-center items-center">
-            <Loader></Loader>
-        </div>
+            isLoadingRequest || isLoadingHub ?
+            <div className="flex w-screen h-screen justify-center items-center">
+                <Loader></Loader>
+            </div>
+            : 
+            <>
+                    { counterRequest!=0 ?
+                        <ShowRequests requests={requests} />
+                        :
+                        <div className="flex w-screen h-screen justify-center items-center">
+                            <p className="text-white">There are no requests</p>
+                        </div>
+                    }
+            </> 
+            
         }
         </>
     )

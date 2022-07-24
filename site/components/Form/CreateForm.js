@@ -1,17 +1,17 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import Input from "../UI/Input";
 import Loader from "../UI/Loader";
-import { ContractAddress, contractABI } from "../../Contract/datas";
 
 import { useMoralis } from "react-moralis";
 import { useRef } from "react";
 import InputSplit from "../UI/InputSplit";
 import { useRouter } from 'next/router';
+import useJob from "../../hooks/useJob";
 
 const CreateForm = () => {
-    const { Moralis } = useMoralis();
+    const { account } = useMoralis();
+    const { CreateJob, isLoadingJob, errorJob } = useJob();
     const router = useRouter();
-
 
     const TitleRef = useRef();
     const DescriptionRef = useRef();
@@ -27,54 +27,7 @@ const CreateForm = () => {
     const DateIRef=useRef();
     const DateFRef = useRef();
 
-    const CreateJob = async() => {
-        setIsLoading(true);
-        setErrorMessage();
-
-        const hourInit = Number((HourIRef.current.input.value).split(":")[0]) *60 + Number((HourIRef.current.input.value).split(":")[1]);
-        const hourFinish = Number((HourFRef.current.input.value).split(":")[0]) *60 + Number((HourFRef.current.input.value).split(":")[1]);
-
-        if(hourFinish <= hourInit)
-            hourFinish += 24 * 60;
-
-        //console.log(hourInit, hourFinish)
-        
-        const dateInit = Math.floor(new Date(DateIRef.current.input.value).getTime() /1000);
-        const dateFinish = Math.floor(new Date(DateFRef.current.input.value).getTime() /1000);
-        //console.log(dateInit, dateFinish);
-
-        let options = {
-            contractAddress: ContractAddress,
-            functionName: "CreateJob",
-            abi: contractABI,
-            params: {
-                _title: `${TitleRef.current.input.value}`,
-                _description: `${DescriptionRef.current.input.value}`,
-                _workingAddress: `${WorkingAddRef.current.input.value}`,
-                _searchingPosition: `${RoleRef.current.input.value}`,
-                _hourInit: hourInit,
-                _hourFinish: hourFinish,
-                _peopleToHire: Number(CounterToHireRef.current.input.value),
-                _dateFrom: dateInit,
-                _dateTo: dateFinish
-            },
-            
-            msgValue: Moralis.Units.ETH(ValueRef.current.input.value),
-        };
-        try{
-            const tx = await Moralis.executeFunction(options);
-            await tx.wait();
-            router.push("/company/myJobs");
-        }catch(err){
-            console.log(err);
-            setErrorMessage(err);
-        }
-        
-        setIsLoading(false);
-
-    }
-
-    const Handler = (e) => {
+    const Handler = async(e) => {
         e.preventDefault();
         let error=false;
 
@@ -137,12 +90,35 @@ const CreateForm = () => {
         }else DateFRef.current.label.className = "hidden";
 
         if(!error){
-            CreateJob();
+            const hourInit = Number((HourIRef.current.input.value).split(":")[0]) *60 + Number((HourIRef.current.input.value).split(":")[1]);
+            const hourFinish = Number((HourFRef.current.input.value).split(":")[0]) *60 + Number((HourFRef.current.input.value).split(":")[1]);
+
+            if(hourFinish <= hourInit)
+                hourFinish += 24 * 60;
+
+            //console.log(hourInit, hourFinish)
+            
+            const dateInit = Math.floor(new Date(DateIRef.current.input.value).getTime() /1000);
+            const dateFinish = Math.floor(new Date(DateFRef.current.input.value).getTime() /1000);
+            //console.log(dateInit, dateFinish);
+
+            const titleParam = `${TitleRef.current.input.value}`;
+            const descriptionParam = `${DescriptionRef.current.input.value}`;
+            const workingAddressParam = `${WorkingAddRef.current.input.value}`;
+            const searchingPositionParam = `${RoleRef.current.input.value}`;
+            const hourInitParam = hourInit;
+            const hourFinishParam = hourFinish;
+            const peopleToHireParam = Number(CounterToHireRef.current.input.value);
+            const dateFromParam = dateInit;
+            const dateToParam = dateFinish;
+            const valueParam = ValueRef.current.input.value;
+
+            const tx = await CreateJob(account, titleParam, descriptionParam, workingAddressParam, searchingPositionParam, hourInitParam, hourFinishParam, peopleToHireParam, dateFromParam, dateToParam, valueParam);
+            if(tx){
+                router.push("/company/myJobs");
+            }
         }
     }
-
-    const [isLoading, setIsLoading] = useState();
-    const [errorMessage, setErrorMessage] = useState();
 
     return(
         <div className="h-screen ">
@@ -172,12 +148,12 @@ const CreateForm = () => {
 
                 <div className="flex justify-center mb-5">
                     <div>
-                    {!isLoading ? <button type="submit" className=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Submit</button> : <Loader></Loader>}
+                    {!isLoadingJob ? <button type="submit" className=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Submit</button> : <Loader></Loader>}
                     </div> 
                 </div>
 
                 <div className="flex justify-center">
-                    {!!errorMessage && <p className="text-red-500 text-xs italic">{errorMessage.message}</p>}
+                    {!!errorJob && <p className="text-red-500 text-xs italic">{errorJob.message}</p>}
                 </div>
             </form>
         </div>

@@ -5,12 +5,10 @@ import useJob from "../../hooks/useJob";
 import useHub from "../../hooks/useHub";
 
 const ShowAllJobs = () => {
-    const { CheckWorkerHired, CheckWorkerApplied, ShowCloseJob, ShowJobsCounter, isLoadingJob} = useJob();
-    const { FetchJob } = useJob();
-    const [error, setError] = useState(false);
-    const [show, setShow] = useState(false);
+    const { CheckWorkerHired, CheckWorkerApplied, ShowCloseJob, ShowJobsCounter, isLoadingJob, FetchJob} = useJob();
+    const {isLoadingHub } = useHub();
     const [jobs, setJobs] = useState( [] );
-    const [counterJobs, setCounterJobs] = useState(0);
+    const [jobCounter, setJobCounter=0] = useState(0);
 
     const addJob = (data, applied, hired, close) => {
         setJobs(prevItems => [...prevItems, {
@@ -23,41 +21,45 @@ const ShowAllJobs = () => {
       }
 
     useEffect( () => {
-        FetchCounterJobs();
+        FetchJobCounter();
     },[])
 
     useEffect(() => {
         FetchJobs();
-    },[counterJobs]);
+    },[jobCounter]);
 
-    const FetchCounterJobs = async() => {
-        setCounterJobs(await ShowJobsCounter());
+    const FetchJobCounter = async() => {
+        setJobCounter(await ShowJobsCounter());
     }
 
     const FetchJobs = async() => {
-        if(counterJobs){
+        if(jobCounter=0){
             setJobs([]);
-            for (let i=0; i < counterJobs; i++){
+            for (let i=0; i < jobCounter; i++){
                 addJob(await FetchJob(i),await CheckWorkerApplied(i),await CheckWorkerHired(i), await ShowCloseJob(i)) 
             }
         } 
     }
 
-    
-
-    
-
     return(
-        <div className="text-white w-screen ml-2 mr-2">
+        <>
             {
-                isLoadingJob ?
+                isLoadingJob || isLoadingHub ?
                 <div className="flex w-screen h-screen justify-center items-center">
                     <Loader></Loader>
                 </div>
                 :
-                <ShowJobs jobs={jobs}></ShowJobs>
+                <>
+                    { jobCounter!=0 ?
+                        <ShowJobs jobs={jobs}></ShowJobs>
+                        :
+                        <div className="flex w-screen h-screen justify-center items-center">
+                            <p className="text-white">There are no jobs</p>
+                        </div>
+                    }
+                </>
             }
-        </div>
+        </>
 
     );
 }

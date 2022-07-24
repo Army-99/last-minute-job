@@ -1,4 +1,5 @@
 # last-minute-job
+Upgrades in V2 Branch
 
 Unfortunately, only in my free time I can develop this project, and in fact it is still not finished.
 
@@ -16,10 +17,5 @@ FRONTEND:
   (All)
   Show worker already hired in jobs and hourly pay
   Improve UX and UI
-  
- SMARTCONTRACT:
-  Change visibility of the functions and variables
-  remove the unnecessary functions
-  divide in 3 smart contracts - JobsContract - RequestsContract - HUBContract (will do in a second version)
   
   

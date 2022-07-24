@@ -14,20 +14,7 @@ const ShowJobs = ({jobs, applied, acceptJob, Loading}) => {
     const { isWorker } = useCredentials();
     const [ isLoading, setIsLoading] = useState(false);
     const [ error, setError] = useState(false);
-    const [ show0, setShow0 ] = useState(false);
     const router = useRouter();
-
-    
-    useEffect( () => {
-        if(jobs.length == 0){
-            setShow0(true);
-        }else{
-            setShow0(false);
-        }
-
-        console.log(show0)
-    },[jobs])
-
 
     const HandleCandidate = (e, nrJob) => {
         e.preventDefault();
@@ -57,12 +44,11 @@ const ShowJobs = ({jobs, applied, acceptJob, Loading}) => {
         
     }
 
+    //TODO Check in father if the counter is 0 and remove show0
     return(
         <>
         {
         isAuthenticated &&
-        <>
-            {!show0 ?
             <div className="sm:grid md:grid-cols-2 lg:grid-cols-3 sm:w-full">
                 {
                     jobs.map( (item,k) => {
@@ -123,13 +109,7 @@ const ShowJobs = ({jobs, applied, acceptJob, Loading}) => {
                         }) 
                     }
             </div>
-            :
-            <div className="flex w-screen h-screen justify-center items-center">
-                <p className="text-white">There are no jobs</p>
-            </div>
-            }
-        </>   
-    }
+        }
     </>
     );
 }

@@ -22,8 +22,8 @@ const CreateJob = () => {
     },[isCompany, isAuthenticated])
     return(
         <div className="text-black flex h-screen w-screen items-center justify-center overflow-y-auto scrollbar-hide" >
-        <CreateForm></CreateForm>
-    </div>
+            <CreateForm></CreateForm>
+        </div>
     ); 
 }
 

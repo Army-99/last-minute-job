@@ -224,7 +224,7 @@ const useHub = () => {
         abi: hubAbi,
         };
         try{
-            tx = await Moralis.executeFunction(options);
+            tx = HexToDec(await Moralis.executeFunction(options));
         }catch(err){
             console.error(err)
             setErrorHub(err);
@@ -312,7 +312,7 @@ const useHub = () => {
         }
         };
         try{
-            tx = await Moralis.executeFunction(options);
+            tx = HexToDec(await Moralis.executeFunction(options));
         }catch(err){
             console.error(err)
             setErrorHub(err);
@@ -392,7 +392,7 @@ const useHub = () => {
         }
         };
         try{
-            tx = await Moralis.executeFunction(options);
+            tx = HexToDec(await Moralis.executeFunction(options));
         }catch(err){
             console.error(err)
             setErrorHub(err);
@@ -437,7 +437,7 @@ const useHub = () => {
         }
         };
         try{
-            tx = await Moralis.executeFunction(options);
+            tx = HexToDec(await Moralis.executeFunction(options));
         }catch(err){
             console.error(err)
             setErrorHub(err);

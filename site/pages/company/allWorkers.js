@@ -21,7 +21,11 @@ const AllWorkers = () => {
     },[isCompany, isAuthenticated])
 
     return(
-        <Workers />
+        <>
+        {isAuthenticated && isCompany &&
+            <Workers />
+        }
+        </>
     )
 }
 

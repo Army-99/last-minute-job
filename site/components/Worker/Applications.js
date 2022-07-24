@@ -55,7 +55,7 @@ const Applications = () => {
   }
 
     return(
-      <div className="text-white w-screen ml-2 mr-2">
+      <>
       {
           show ?
           <ShowJobs jobs={jobs} applied={true} acceptJob={HandleAcceptJob} Loading={isLoadingJob}></ShowJobs>
@@ -64,7 +64,7 @@ const Applications = () => {
             <Loader></Loader>
           </div>
       }
-  </div>
+      </>
     );
 };
 

@@ -12,7 +12,8 @@ async function main() {
   */
 
   /* NEW */ 
-  const Hub = await hre.ethers.getContractFactory("Hub");
+  
+  const Hub = await hre.ethers.getContractFactory("HUB");
   const hub = await Hub.deploy();
   await hub.deployed();
   console.log("HUB deployed to:", hub.address);

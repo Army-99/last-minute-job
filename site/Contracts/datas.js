@@ -8,7 +8,7 @@ const hubAbi=interfaceHUBAbi.abi;
 const jobAddress="0x5388C0DCbBA944024C321A110c2DE29084583b10";
 const jobAbi=interfaceJobAbi.abi;
 
-const requestAddress="0x351875F56B61A6c2Cf676CC69251b3b3a779A103";
+const requestAddress="0xF028bE9Ac796ea781350a912ECC71a2B09496F49";
 const requestAbi=interfaceRequestAbi.abi;
 
 export { hubAbi, hubAddress, jobAddress, jobAbi, requestAddress, requestAbi};

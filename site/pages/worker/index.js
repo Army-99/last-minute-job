@@ -5,17 +5,17 @@ import useCredentials from "../../hooks/useCredentials";
 
 const Person = () => {
     const { isAuthenticated } = useMoralis();
-    const { isWorker } = useCredentials();
+    const { isWorker, isCompany } = useCredentials();
     const router = useRouter();
 
     useEffect(() => {
         if(!isAuthenticated){
             router.replace("/");
         }else{
-            if(isWorker!=null  && !isWorker)
+            if( isWorker!=null  && !isWorker )
                 router.replace("/dashboard");
         }      
-    },[isWorker, isAuthenticated])
+    },[isWorker, isAuthenticated, isCompany])
 
     return(
         <div className="text-white">Person</div>

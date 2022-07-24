@@ -8,7 +8,7 @@ const useJob = () => {
     const [ isLoadingJob, setIsLoadingJob ] = useState(false);
     const [ errorJob, setErrorJob ] = useState(false);
 
-    const CreateJob = async(owner, title, description, workingAddress, searchingPosition, hourInit, hourFinish, peopleToHire, dateFrom, dateTo) => {
+    const CreateJob = async(owner, title, description, workingAddress, searchingPosition, hourInit, hourFinish, peopleToHire, dateFrom, dateTo, value) => {
         setIsLoadingJob(true);
         let tx;
         let options = {
@@ -26,7 +26,8 @@ const useJob = () => {
             _peopleToHire: peopleToHire,
             _dateFrom: dateFrom,
             _dateTo: dateTo
-        }
+        },
+        msgValue: Moralis.Units.ETH(value),
         };
         try{
             tx = await Moralis.executeFunction(options);
@@ -86,7 +87,7 @@ const useJob = () => {
         let tx;
         let options = {
         contractAddress: jobAddress,
-        functionName: "CreateJob",
+        functionName: "ApplyToJob",
         abi: jobAbi,
         params: {
             worker: workerAddress,

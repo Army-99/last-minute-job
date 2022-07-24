@@ -33,7 +33,7 @@ const SideBar = ({children}) => {
     return(
     <div className='bg-black h-screen overflow-hidden'>
         <main className='flex'>
-        {isAuthenticated &&
+        {isAuthenticated && 
             <div className="text-gray-500 p-5 text-sm border-r border-gray-900 h-screen" >
                 <div className="items-start mb-20">
                     <div className="flex justify-center">

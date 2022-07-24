@@ -1,17 +1,18 @@
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react"
 import { MoralisProvider, useMoralis } from "react-moralis";
-import { ContractAddress, contractABI} from "../../Contract/datas";
 import useJob from "../../hooks/useJob";
 import Candidate from "../../components/Company/Candidate";
 import Button from "../../components/UI/Button";
 import useCredentials from "../../hooks/useCredentials";
+import useHub from "../../hooks/useHub";
 
 const ManageJob = () => {
-    const { isAuthenticated, Moralis } = useMoralis();
+    const { isAuthenticated, Moralis, account } = useMoralis();
     const { isCompany } = useCredentials();
-    const { FetchCompanyPublicJob, HireQuestion, isLoadingJob } = useJob();
-    const { FetchJob, ShowJobCandidatesCounter, ShowJobCandidate, CheckJobClose, SetAbsentHours } = useJob();
+    const { ShowJobIDCompany } = useHub();
+    const { isLoadingJob, ShowJobSummary, ShowJobCandidatesCounter, ShowCloseJob } = useJob();
+    //const { FetchJob, ShowJobCandidatesCounter, ShowJobCandidate, CheckJobClose, SetAbsentHours } = useJob();
 
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState();
@@ -26,7 +27,6 @@ const ManageJob = () => {
     const [candidates, setCandidates] = useState([]);
     const [jobClose, setJobClose] = useState(null);
     const refHoursAbsent = useRef();
-    
 
     //Check if is auth, is company and is the owner
     useEffect(() => {
@@ -43,42 +43,22 @@ const ManageJob = () => {
             if(owner.toUpperCase() !== Moralis.account.toUpperCase())
                 router.replace("/dashboard");
         }
-        
     },[isCompany, isAuthenticated, owner])
 
     //Fetching the public ID of the job
     useEffect(() => {
-        const Fetch = async() => {
-            setJobID(await FetchCompanyPublicJob(idCompanyJob));
-        }
-        Fetch();
+        FetchPublicJobID();
     },[idCompanyJob]);
 
     //Fetch Summary Job and set counter candidates
     useEffect(() => {
-        const Fetch = async() => {
-            if(jobID>=0 && !isLoading){
-                //for take summary of the job
-                setJob(await FetchJob(jobID));
-                //for take the counter of candidates
-                setCounterCandidates(await ShowJobCandidatesCounter(jobID));
-            }
-        }
-        Fetch();  
-        //console.log(job)
-    },[jobID, isLoading])
+        FetchJobSummary();  
+    },[jobID])
 
     //when job is initialized set owner for the check of the first useeffect
     useEffect(()=> {
-        
-        const SetStates = async() => {
-            setOwner(job[0]);
-            setSearching(job[9]);
-            setJobClose(await CheckJobClose(jobID));
-        }
         if(job)
-            SetStates()
-
+            SetStates();
     },[job])
 
     //Fetch the candidates and push into an array
@@ -94,6 +74,25 @@ const ManageJob = () => {
         Fetch();
         //console.log(candidates)
     },[counterCandidates,isLoadingJob])
+
+    const FetchPublicJobID = async() => {
+        setJobID(await ShowJobIDCompany(account, idCompanyJob));
+    }
+
+    const FetchJobSummary = async() => {
+        if(jobID>=0 && !isLoading){
+            //for take summary of the job
+            setJob(await ShowJobSummary(jobID));
+            //for take the counter of candidates
+            setCounterCandidates(await ShowJobCandidatesCounter(jobID));
+        }
+    }
+
+    const SetStates = async() => {
+        setOwner(job[0]);
+        setSearching(job[9]);
+        setJobClose(await ShowCloseJob(jobID));
+    }
 
     //For manage the state with array
     const addCandidate = (data) => {

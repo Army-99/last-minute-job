@@ -6,12 +6,10 @@ import ShowRequests from "../ShowRequests";
 import Loader from "../UI/Loader";
 
 const IncomingRequest = () => {
-    const { ShowCounterRequestsPerson, ShowIDRequestPerson, FetchRequest, isLoadingRequest } = useRequest();
-    const { ShowWorkerCounterRequests, isLoadingHub } = useHub();
+    const { isLoadingRequest, ShowIDRequestPerson, FetchRequest } = useRequest();
+    const { isLoadingHub, ShowWorkerCounterRequests } = useHub();
     const [ requests, setRequests] = useState([]);
     const [counterRequest, setCounterRequest] = useState(null);
-    const [nrRequest, setNrRequest] = useState();
-    const [show, setShow] = useState(false);
 
     const addRequest = (data, nrRequest) => {
         setRequests(prevItems => [...prevItems, {
@@ -52,13 +50,22 @@ const IncomingRequest = () => {
 
     return(
         <>
-        {isLoadingHub ? 
-        <div className="flex w-screen h-screen justify-center items-center">
-            <Loader></Loader>
-        </div> 
-        : 
-        <ShowRequests requests={requests}></ShowRequests>
-        }
+            {
+                isLoadingRequest || isLoadingHub ?
+                <>
+                        { counterRequest!=0 ?
+                            <ShowRequests requests={requests} />
+                            :
+                            <div className="flex w-screen h-screen justify-center items-center">
+                                <p className="text-white">There are no requests</p>
+                            </div>
+                        }
+                </> 
+                : 
+                <div className="flex w-screen h-screen justify-center items-center">
+                    <Loader></Loader>
+                </div>
+            }
         </>
     )
 }
