@@ -5,10 +5,10 @@ import useJob from "../../hooks/useJob";
 import useHub from "../../hooks/useHub";
 
 const ShowAllJobs = () => {
-    const { CheckWorkerHired, CheckWorkerApplied, ShowCloseJob, ShowJobsCounter, isLoadingJob, FetchJob} = useJob();
+    const { CheckWorkerHired, CheckWorkerApplied, ShowCloseJob, ShowJobsCounter, isLoadingJob, ShowJobSummary} = useJob();
     const {isLoadingHub } = useHub();
     const [jobs, setJobs] = useState( [] );
-    const [jobCounter, setJobCounter=0] = useState(0);
+    const [jobCounter, setJobCounter] = useState();
 
     const addJob = (data, applied, hired, close) => {
         setJobs(prevItems => [...prevItems, {
@@ -26,23 +26,26 @@ const ShowAllJobs = () => {
 
     useEffect(() => {
         FetchJobs();
+        console.log(jobCounter)
     },[jobCounter]);
 
     const FetchJobCounter = async() => {
+
+        //console.log("SC: "+ await ShowJobsCounter());
         setJobCounter(await ShowJobsCounter());
     }
 
     const FetchJobs = async() => {
-        if(jobCounter=0){
+        if(jobCounter){
             setJobs([]);
             for (let i=0; i < jobCounter; i++){
-                addJob(await FetchJob(i),await CheckWorkerApplied(i),await CheckWorkerHired(i), await ShowCloseJob(i)) 
+                addJob(await ShowJobSummary(i),await CheckWorkerApplied(i),await CheckWorkerHired(i), await ShowCloseJob(i)) 
             }
         } 
     }
 
     return(
-        <>
+        <div className="text-white w-screen ml-2 mr-2">
             {
                 isLoadingJob || isLoadingHub ?
                 <div className="flex w-screen h-screen justify-center items-center">
@@ -59,8 +62,7 @@ const ShowAllJobs = () => {
                     }
                 </>
             }
-        </>
-
+        </div>
     );
 }
 
