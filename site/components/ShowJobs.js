@@ -6,42 +6,28 @@ import Link from 'next/link';
 import { getEllipsisTxt, HexToDec } from "../helpers/formatters";
 import { useRouter } from "next/router";
 import useCredentials from "../hooks/useCredentials";
+import useJob from "../hooks/useJob";
+import ModalSendCandidature from "./Worker/ModalSendCandidature";
 
 
 const ShowJobs = ({jobs, applied, acceptJob, Loading}) => {
 
-    const { Moralis, isAuthenticated } = useMoralis();
+    const { Moralis, isAuthenticated, account } = useMoralis();
+    const { isLoadingJob } = useJob();
     const { isWorker } = useCredentials();
-    const [ isLoading, setIsLoading] = useState(false);
-    const [ error, setError] = useState(false);
+    const [ showModal, setShowModal] = useState(false);
+    const [ selectedJob, setSelectedJob] = useState();
     const router = useRouter();
 
-    const HandleCandidate = (e, nrJob) => {
+    const HandleCandidate = async(e, nrJob) => {
         e.preventDefault();
-        //console.log("PREMUTO " + nrJob)
-        Candidate(nrJob);
-        router.push("/worker/jobApplications");
-    }
-
-    const Candidate = async(nrJob) => {
-        setIsLoading(true);
-          let options = {
-            contractAddress: ContractAddress,
-            functionName: "applyToJob",
-            abi: contractABI,
-            params: {
-                _nrJob: nrJob
-            },
-          };
-          try{
-            const tx  = await Moralis.executeFunction(options);
-            await tx.wait();
-            setIsLoading(false);
-          }catch(err){
-            setError(err);
-            setIsLoading(false);
-          }
-        
+        console.log("PREMUTO " + nrJob);
+        setSelectedJob(nrJob);
+        setShowModal(true);
+        //ApplyToJob = async(workerAddress, nrJob, name, surname, mobilePhone, CV, coverLetter)
+        //await ApplyToJob(account, nrJob);
+        //Candidate(nrJob);
+        //router.push("/worker/jobApplications");
     }
 
     //TODO Check in father if the counter is 0 and remove show0
@@ -49,6 +35,8 @@ const ShowJobs = ({jobs, applied, acceptJob, Loading}) => {
         <>
         {
         isAuthenticated &&
+            <>
+            {showModal && <ModalSendCandidature nrJob={selectedJob} close={() => setShowModal(false)}></ModalSendCandidature>}
             <div className="sm:grid md:grid-cols-2 lg:grid-cols-3 sm:w-full">
                 {
                     jobs.map( (item,k) => {
@@ -80,7 +68,7 @@ const ShowJobs = ({jobs, applied, acceptJob, Loading}) => {
                                     <div className="justify-between items-center px-6 py-4">
                                     {searching ? <div className="bg-green-600 text-xs uppercase px-2 py-1 rounded-full border border-gray-200 text-gray-200 font-bold">Searching</div> 
                                                 : <div className="bg-red-600 text-xs uppercase px-2 py-1 rounded-full border border-gray-200 text-gray-200 font-bold justify-center flex">Search is Close</div>}
-                                    {isWorker && !item.applied && !applied && <Button Loading={isLoading} onClick={e => HandleCandidate(e,k)}>Candidate</Button>}
+                                    {isWorker && !item.applied && !applied && <Button Loading={isLoadingJob} onClick={e => HandleCandidate(e,k)}>Candidate</Button>}
                                     <div className="text-sm flex justify-center">{dateInit.getDate() + '/' + dateInit.getMonth() + '/' +dateInit.getFullYear()} - {dateFinish.getDate() + '/' + dateFinish.getMonth() + '/' +dateFinish.getFullYear()}</div>
                                     </div>
 
@@ -109,6 +97,7 @@ const ShowJobs = ({jobs, applied, acceptJob, Loading}) => {
                         }) 
                     }
             </div>
+            </>
         }
     </>
     );
