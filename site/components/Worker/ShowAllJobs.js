@@ -26,7 +26,7 @@ const ShowAllJobs = () => {
 
     useEffect(() => {
         FetchJobs();
-        console.log(jobCounter)
+        //console.log(jobCounter)
     },[jobCounter]);
 
     const FetchJobCounter = async() => {

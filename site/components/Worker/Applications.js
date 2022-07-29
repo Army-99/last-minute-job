@@ -5,9 +5,9 @@ import useJob from "../../hooks/useJob";
 import useHub from "../../hooks/useHub";
 
 const Applications = () => {
-    const { FetchPersonPublicJob, CheckIfHireQuestion, CheckIfHired } = useJob();
-    const { isLoadingJob, FetchJob, AcceptJob , CheckJobClose } = useJob();
-    const { ShowWorkerAppliedJobsCounter } = useHub();
+    const { FetchPersonPublicJob, } = useJob();
+    const { isLoadingJob, ShowJobSummary, AcceptJob, ShowIfHireQuestion, CheckWorkerHired, ShowCloseJob } = useJob();
+    const { isLoadingHub, ShowWorkerAppliedJobsCounter, ShowJobIDWorker } = useHub();
     const [jobs, setJobs] = useState([]);
     const [show, setShow] = useState(false);
     const [ counterAppliedJobs, setCounterAppliedJobs ] = useState();
@@ -27,22 +27,23 @@ const Applications = () => {
   },[])
 
   useEffect(() => {
-    const Fetch = async() => {
-      setJobs([]);
-      if(counterAppliedJobs<=0 || isLoadingJob) return;
-      for (let i=0; i < counterAppliedJobs; i++){
-        const personAppliedJob = await FetchPersonPublicJob(i);
-        addItem(await FetchJob(personAppliedJob), await CheckIfHireQuestion(i), await CheckIfHired(i), await CheckJobClose(i));
-      }
-    }
-    Fetch();
-  },[counterAppliedJobs,isLoadingJob]);
+    FetchJobs();
+  },[counterAppliedJobs]);
 
   useEffect(() => {
     if(jobs.length==counterAppliedJobs){
       setShow(true);
     }  
   },[jobs])
+
+  const FetchJobs = async() => {
+    setJobs([]);
+    if(counterAppliedJobs<=0 || isLoadingJob) return;
+    for (let i=0; i < counterAppliedJobs; i++){
+      const workerAppliedJob = await ShowJobIDWorker(i);
+      addItem(await ShowJobSummary(workerAppliedJob), await ShowIfHireQuestion(i), await CheckWorkerHired(i), await ShowCloseJob(i));
+    }
+  }
 
   const HandleAcceptJob = async(e, nrAppliedJob) => {
     e.preventDefault();
@@ -55,16 +56,24 @@ const Applications = () => {
   }
 
     return(
-      <>
-      {
-          show ?
-          <ShowJobs jobs={jobs} applied={true} acceptJob={HandleAcceptJob} Loading={isLoadingJob}></ShowJobs>
-          :
-          <div className="flex w-screen h-screen justify-center items-center">
-            <Loader></Loader>
-          </div>
-      }
-      </>
+      <div className="text-white w-screen ml-2 mr-2">
+            {
+                isLoadingJob || isLoadingHub ?
+                <div className="flex w-screen h-screen justify-center items-center">
+                    <Loader></Loader>
+                </div>
+                :
+                <>
+                    { counterAppliedJobs!=0 ?
+                        <ShowJobs jobs={jobs} applied={true} acceptJob={HandleAcceptJob} Loading={isLoadingJob}></ShowJobs>
+                        :
+                        <div className="flex w-screen h-screen justify-center items-center">
+                            <p className="text-white">There are no jobs</p>
+                        </div>
+                    }
+                </>
+            }
+        </div>
     );
 };
 
