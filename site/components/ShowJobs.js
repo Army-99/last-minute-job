@@ -24,10 +24,6 @@ const ShowJobs = ({jobs, applied, acceptJob, Loading}) => {
         console.log("PREMUTO " + nrJob);
         setSelectedJob(nrJob);
         setShowModal(true);
-        //ApplyToJob = async(workerAddress, nrJob, name, surname, mobilePhone, CV, coverLetter)
-        //await ApplyToJob(account, nrJob);
-        //Candidate(nrJob);
-        //router.push("/worker/jobApplications");
     }
 
     //TODO Check in father if the counter is 0 and remove show0

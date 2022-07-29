@@ -82,7 +82,7 @@ const useJob = () => {
         return tx;
     };
 
-    const ApplyToJob = async(workerAddress, nrJob, name, surname, mobilePhone, CV, coverLetter) => {
+    const ApplyToJob = async(workerAddress, nrJob, name, surname, mobilePhone, CV, coverLetter, age) => {
         setIsLoadingJob(true);
         let tx;
         let options = {
@@ -97,6 +97,7 @@ const useJob = () => {
             _mobilePhone: mobilePhone,
             _CV: CV,
             _coverLetter: coverLetter,
+            _age: age
         }
         };
         try{

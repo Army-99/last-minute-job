@@ -1,16 +1,70 @@
+import { useRef } from "react";
+import { useMoralis } from "react-moralis";
 import useJob from "../../hooks/useJob";
 import Input from "../UI/Input";
 import InputSplit from "../UI/InputSplit";
+import Loader from "../UI/Loader";
 
 const ModalSendCandidature = ({nrJob, close}) => {
 
     const { isLoadingJob, errorJob, ApplyToJob } = useJob();
+    const { account }  = useMoralis();
 
-    
+    const nameRef = useRef();
+    const surnameRef = useRef();
+    const mobilePhoneRef = useRef();
+    const CVRef = useRef();
+    const coverLetterRef = useRef();
+    const ageRef = useRef();
 
     const Handler = async(e) => {
         e.preventDefault();
-        console.log("MODAL: " + nrJob);
+
+        let error=false;
+
+        if(!nameRef.current.input.value){
+            error=true;
+            nameRef.current.label.className = "text-red-500 text-xs italic";
+        }else nameRef.current.label.className = "hidden";
+
+        if(!surnameRef.current.input.value){
+            error=true;
+            surnameRef.current.label.className = "text-red-500 text-xs italic";
+        }else surnameRef.current.label.className = "hidden";
+
+        if(!mobilePhoneRef.current.input.value){
+            error=true;
+            mobilePhoneRef.current.label.className = "text-red-500 text-xs italic";
+        }else mobilePhoneRef.current.label.className = "hidden";
+
+        if(!CVRef.current.input.value){
+            error=true;
+            CVRef.current.label.className = "text-red-500 text-xs italic";
+        }else CVRef.current.label.className = "hidden";
+
+        if(!coverLetterRef.current.input.value){
+            error=true;
+            coverLetterRef.current.label.className = "text-red-500 text-xs italic";
+        }else coverLetterRef.current.label.className = "hidden";
+
+        if(!ageRef.current.input.value){
+            error=true;
+            ageRef.current.label.className = "text-red-500 text-xs italic";
+        }else ageRef.current.label.className = "hidden";
+
+        if(!error){
+            let name = nameRef.current.input.value;
+            let surname = surnameRef.current.input.value;
+            let mobPhone = mobilePhoneRef.current.input.value;
+            let CV = CVRef.current.input.value;
+            let coverLetter = coverLetterRef.current.input.value;
+            let age = ageRef.current.input.value;
+
+            const tx = await ApplyToJob(account, nrJob, name, surname, mobPhone, CV, coverLetter, age);
+            if(tx)
+                close();
+        }
+
     };
 
     return(
@@ -22,7 +76,7 @@ const ModalSendCandidature = ({nrJob, close}) => {
                     <div className="border-0 rounded-lg shadow-lg flex flex-col w-full bg-gray-200 outline-none focus:outline-none mb-5 ">
 
                         {/*header*/}
-                        <div className="items-center  justify-center p-5 border-b border-solid border-black rounded-t text-black">
+                        <div className="items-center  justify-center p-5 border-b border-solid border-black rounded-t text-black mt-14">
                             <h3 className="text-3xl font-semibold text-center">
                                 Send Candidature
                             </h3>
@@ -30,25 +84,13 @@ const ModalSendCandidature = ({nrJob, close}) => {
                         
                         {/*body*/}
                         <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glassmorphism text-black mt-5">
-{/*
-                            <Input value={"Amount"} type={"decimal"} min={0} ref={AmountRef}></Input>
-                            <Input value={"Title"} type={"text"} min={0} ref={TitleRef}></Input>
-                            <Input value={"Working Address"} type={"text"} min={0} ref={WAddRef}></Input>
-                            <Input value={"Description"} type={"text"} min={0} ref={DescRef}></Input>
-                            
 
-                            <div className="flex flex-wrap -mx-3 mb-4">
-                                <InputSplit value={"Hour Init"} width={"w-1/2"} type={"time"} ref={HourIRef}></InputSplit>
-                                <InputSplit value={"Hour Finish"} width={"w-1/2"} type={"time"} ref={HourFRef}></InputSplit>
-                            </div>
-
-                            <div className="flex flex-wrap -mx-3 mb-10">
-                                <InputSplit value={"Date Init"} width={"sm:w-1/2"} type={"date"} ref={DateIRef}></InputSplit>
-                                <InputSplit value={"Date Finish"} width={"sm:w-1/2"} type={"date"} ref={DateFRef}></InputSplit>
-                            </div>
-
-                            <Input value={"Message"} type={"text"} min={0} ref={MessageRef}></Input>
-*/}
+                            <Input value={"Name"} type={"text"} ref={nameRef}></Input>
+                            <Input value={"Surname"} type={"text"} ref={surnameRef}></Input>
+                            <Input value={"Mobile Phone"} type={"text"} ref={mobilePhoneRef}></Input>
+                            <Input value={"CV"} type={"text"} ref={CVRef}></Input>
+                            <Input value={"Cover Letter"} type={"text"} ref={coverLetterRef}></Input>
+                            <Input value={"Age"} type={"number"} ref={ageRef} min={16}></Input>
                         </div>
 
                         {/*footer*/}
